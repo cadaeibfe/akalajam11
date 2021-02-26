@@ -1,3 +1,6 @@
+from enum import Enum
+from functools import lru_cache
+
 import pygame as pg
 
 TILE_SIZE = 64
@@ -56,12 +59,13 @@ class World:
 
 
 class Mob:
-    def __init__(self, world, glyph, x, y):
+    def __init__(self, world, glyph, x, y, ai):
         self.world = world
         self.world.add_mob_at(self, x, y)
         self.glyph = glyph
         self.x = x
         self.y = y
+        self.ai = ai
 
     def move(self, mx, my):
         newx = self.x + mx
@@ -69,7 +73,7 @@ class Mob:
 
         other = self.world.get_mob(newx, newy)
         if other != None:
-            print("mob bump")
+            other.ai.on_bump()
             return
 
         if self.world.is_walkable(newx, newy):
@@ -80,14 +84,33 @@ class Mob:
             print("wall bump")
 
 
+class ArchAi:
+    def __init__(self, game):
+        self.game = game
+
+    def on_bump(self):
+        text = "Archaeologist:\nOh, you're here!\nThanks for helping me with my expedition."
+        self.game.talking_time(text)
+
+
+class State(Enum):
+    PLAY = 1
+    TALK = 2
+
+
 class Game:
     def run(self):
+        # Basic setup
         screen = pg.display.set_mode((800, 600))
         clock = pg.time.Clock()
         dt = 0
 
+        # Load resources
+        self.talk_font = pg.font.Font("freesansbold.ttf", 32)
+
         self.new_game()
 
+        # Main game loop
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -102,20 +125,27 @@ class Game:
             dt = clock.tick(60)
 
     def new_game(self):
+        self.state = State.PLAY
         self.world = World()
-        self.player = Mob(self.world, 3, 1, 1)
-        self.arch = Mob(self.world, 4, 3, 1)
+        self.player = Mob(self.world, 3, 1, 1, None)
+        self.arch = Mob(self.world, 4, 3, 1, ArchAi(self))
 
     def on_event(self, event):
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_LEFT:
-                self.player.move(-1, 0)
-            elif event.key == pg.K_RIGHT:
-                self.player.move(1, 0)
-            elif event.key == pg.K_UP:
-                self.player.move(0, -1)
-            elif event.key == pg.K_DOWN:
-                self.player.move(0, 1)
+        if self.state == State.PLAY:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_LEFT:
+                    self.player.move(-1, 0)
+                elif event.key == pg.K_RIGHT:
+                    self.player.move(1, 0)
+                elif event.key == pg.K_UP:
+                    self.player.move(0, -1)
+                elif event.key == pg.K_DOWN:
+                    self.player.move(0, 1)
+
+        elif self.state == State.TALK:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_z:
+                    self.state = State.PLAY
 
     def on_update(self, dt):
         pass
@@ -136,6 +166,31 @@ class Game:
                 image = self.world.get_image(x, y)
                 surf.blit(image, rect)
 
+        if self.state == State.TALK:
+            talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
+            pg.draw.rect(surf, (0, 0, 0), talk_rect)
+            pg.draw.rect(surf, (245, 245, 245), talk_rect, 1)
+
+            y = 40
+            for line in self.talk_lines:
+                draw_text(surf, self.talk_font, line, 40, y)
+                y += self.talk_font.get_linesize()
+
+            pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
+
+    def talking_time(self, text):
+        self.state = State.TALK
+        self.talk_lines = text.split('\n')
+
+
+def draw_text(surf, font, text, x, y):
+    text_surf = render_text(font, text, (245, 245, 245))
+    text_rect = text_surf.get_rect(topleft = (x, y))
+    surf.blit(text_surf, text_rect)
+
+@lru_cache
+def render_text(font, text, color):
+    return font.render(text, True, color)
 
 if __name__ == "__main__":
     pg.init()
