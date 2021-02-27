@@ -3,7 +3,7 @@ import random as rng
 
 import pygame as pg
 
-TILE_SIZE = 32
+TILE_SIZE = 60
 
 
 class Tile(Enum):
@@ -107,18 +107,8 @@ class World:
         self.generator = MazeGenerator()
         self.new_level()
 
-        self.tile_sheet = pg.Surface((384, 64))
-        self.tile_sheet.set_colorkey((0, 0, 0))
-        pg.draw.rect(self.tile_sheet, (255, 0, 0), (0, 0, TILE_SIZE, TILE_SIZE), 1)                 # out of bounds
-        pg.draw.rect(self.tile_sheet, (48, 48, 48), (TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))           # floor
-        pg.draw.rect(self.tile_sheet, (156, 156, 156), (2*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))      # wall
-        pg.draw.rect(self.tile_sheet, (80, 80, 80), (2*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE), 2)
-        pg.draw.rect(self.tile_sheet, (48, 48, 48), (3*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))         # up stairs
-        pg.draw.line(self.tile_sheet, (235, 235, 235), (3.75*TILE_SIZE, 10), (3.25*TILE_SIZE, 0.5*TILE_SIZE), 5)
-        pg.draw.line(self.tile_sheet, (235, 235, 235), (3.75*TILE_SIZE, TILE_SIZE-10), (3.25*TILE_SIZE, 0.5*TILE_SIZE), 5)
-        pg.draw.rect(self.tile_sheet, (0, 121, 241), (4*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))        # player
-        pg.draw.rect(self.tile_sheet, (0, 228, 48), (5*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))         # archaeologist
-        pg.draw.rect(self.tile_sheet, (230, 41, 55), (6*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))        # lizardman
+        self.tile_sheet = pg.image.load("images/tile_sheet.png").convert()
+        self.tile_sheet = pg.transform.scale(self.tile_sheet, (self.tile_sheet.get_width()*3, self.tile_sheet.get_height()*3))
 
     def new_level(self):
         self.tiles, self.start_pos = self.generator.generate(20, 20)
