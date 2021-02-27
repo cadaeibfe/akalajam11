@@ -6,7 +6,7 @@ import pygame as pg
 from assets import Assets
 from mobs import Lizardman, Player
 from quest import Quest
-from world import Tile, TILE_SIZE, World
+from world import Tile, World
 
 
 class State(Enum):

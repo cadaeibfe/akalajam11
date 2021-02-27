@@ -17,8 +17,14 @@ class Mob(pg.sprite.Sprite):
         self.attack_power = attack_power
         self.defense_power = defense_power
         self.vision = 0
+        self.flip_h = False
 
     def move(self, mx, my):
+        if mx < 0:
+            self.flip_h = True
+        elif mx > 0:
+            self.flip_h = False
+            
         newx = self.x + mx
         newy = self.y + my
 

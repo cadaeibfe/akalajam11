@@ -1,5 +1,7 @@
 import pygame as pg
 
+TILE_SIZE = 60
+
 class Assets:
     @staticmethod
     def load_assets():
@@ -10,6 +12,7 @@ class Assets:
         # images
         Assets.tile_sheet = pg.image.load("images/tile_sheet.png").convert()
         Assets.tile_sheet = pg.transform.scale(Assets.tile_sheet, (Assets.tile_sheet.get_width()*3, Assets.tile_sheet.get_height()*3))
+        Assets.tile_sheet_flip_h = pg.transform.flip(Assets.tile_sheet, True, False)
 
         # sounds
         Assets.step_sound = pg.mixer.Sound("sounds/Hit_Hurt5.wav")
@@ -17,3 +20,10 @@ class Assets:
         Assets.hit_sound = pg.mixer.Sound("sounds/Hit_Hurt22.wav")
         Assets.up_stairs_sound = pg.mixer.Sound("sounds/Hit_Hurt3.wav")
         Assets.powerup_sound = pg.mixer.Sound("sounds/Powerup6.wav")
+
+    @staticmethod
+    def get_tile_image(tile, flip_h=False):
+        if flip_h:
+            return Assets.tile_sheet_flip_h.subsurface((Assets.tile_sheet_flip_h.get_width() - (tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+        else:
+            return Assets.tile_sheet.subsurface((tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))

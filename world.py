@@ -3,9 +3,7 @@ import random as rng
 
 import pygame as pg
 
-from assets import Assets
-
-TILE_SIZE = 60
+from assets import Assets, TILE_SIZE
 
 
 class Tile(Enum):
@@ -146,7 +144,7 @@ class World:
 
     def get_image(self, x, y):
         tile = self.get_tile(x, y)
-        return Assets.tile_sheet.subsurface((tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+        return Assets.get_tile_image(tile)
 
     def is_walkable(self, x, y):
         tile = self.get_tile(x, y)
@@ -182,12 +180,12 @@ class World:
         for item in self.items:
             rect = pg.Rect(scroll_x + item.x*TILE_SIZE, scroll_y + item.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(item.x, item.y):
-                image = Assets.tile_sheet.subsurface((item.tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.get_tile_image(item.tile)
                 surf.blit(image, rect)
 
         # draw mobs
         for mob in self.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(mob.x, mob.y):
-                image = Assets.tile_sheet.subsurface((mob.tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.get_tile_image(mob.tile, mob.flip_h)
                 surf.blit(image, rect)
