@@ -84,6 +84,18 @@ class Mob(pg.sprite.Sprite):
             move = rng.choice(choices)
             self.move(*move)
 
+    def hunt(self):
+        dx = self.target.x - self.x
+        dy = self.target.y - self.y
+        if dx < 0:
+            self.move(-1, 0)
+        elif dx > 0:
+            self.move(1, 0)
+        elif dy < 0:
+            self.move(0, -1)
+        elif dy > 0:
+            self.move(0, 1)
+
 
 class Player(Mob):
     def __init__(self, world, factory):
@@ -143,20 +155,13 @@ class Lizardman(Mob):
 
     def update(self):
         if self.can_see(self.target.x, self.target.y):
-            dx = self.target.x - self.x
-            dy = self.target.y - self.y
-            if dx < 0:
-                self.move(-1, 0)
-            elif dx > 0:
-                self.move(1, 0)
-            elif dy < 0:
-                self.move(0, -1)
-            elif dy > 0:
-                self.move(0, 1)
+            self.hunt()
 
     def drop_loot(self):
+        r = rng.random()
+
         # lizardmen can drop the three treasures, in order
-        if rng.random() < 0.2:
+        if r < 0.2:
             if not Quest.has_sword:
                 self.world.items.add(Item(Tile.SWORD, self.x, self.y))
             elif not Quest.has_shield:
@@ -165,15 +170,23 @@ class Lizardman(Mob):
                 self.world.items.add(Item(Tile.CROWN, self.x, self.y))
             else:  # no more treasures, just drop a potion
                 self.world.items.add(Item(Tile.POTION, self.x, self.y))
+        elif r < 0.6:
+            self.world.items.add(Item(Tile.POTION, self.x, self.y))
 
 
 class Slime(Mob):
-    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power, target):
         super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
+        self.target = target
+        self.vision = 2
 
     def update(self):
-        if rng.random() < 0.5:
-            self.wander()
+        num_turns = rng.randrange(0, 2)  # slime is slow, sometimes doesn't move
+        for i in range(num_turns):
+            if self.can_see(self.target.x, self.target.y):
+                self.hunt()
+            else:
+                self.wander()
 
     def drop_loot(self):
         if rng.random() < 0.4:
@@ -181,12 +194,18 @@ class Slime(Mob):
 
 
 class Bat(Mob):
-    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power, target):
         super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
+        self.target = target
+        self.vision = 2
 
     def update(self):
-        self.wander()
-        self.wander()
+        num_turns = rng.randrange(1, 3)  # bat is fast, sometimes gets 2 moves
+        for i in range(num_turns):
+            if self.can_see(self.target.x, self.target.y):
+                self.hunt()
+            else:
+                self.wander()
 
     def drop_loot(self):
         # Bats are harder so have higher chance to drop a potion

@@ -65,10 +65,10 @@ class Game:
                 lizardman = Lizardman(self.world, self, Tile.LIZARD, 15, 4, 1, self.player)
                 self.world.add_mob_at_random_empty_pos(lizardman)
             elif t == 1:
-                slime = Slime(self.world, self, Tile.SLIME, 5, 1, 0)
+                slime = Slime(self.world, self, Tile.SLIME, 5, 1, 0, self.player)
                 self.world.add_mob_at_random_empty_pos(slime)
             elif t == 2:
-                bat = Bat(self.world, self, Tile.BAT, 10, 2, 0)
+                bat = Bat(self.world, self, Tile.BAT, 10, 2, 0, self.player)
                 self.world.add_mob_at_random_empty_pos(bat)
 
     def new_float_text(self, text, x, y, color):
