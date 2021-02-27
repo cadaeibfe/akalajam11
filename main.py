@@ -66,12 +66,13 @@ class Game:
                     self.player.move(0, -1)
                 elif event.key == pg.K_DOWN:
                     self.player.move(0, 1)
-                elif event.unicode == "<":
-                    self.up_stairs()
                 ## DEBUG
                 elif event.key == pg.K_r:
                     self.new_game()
                 ## ENDDEBUG
+
+                if self.world.get_tile(self.player.x, self.player.y) == Tile.UP_STAIRS:
+                    self.up_stairs()
 
         elif self.state == State.TALK:
             if event.type == pg.KEYDOWN:
