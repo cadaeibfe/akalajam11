@@ -1,5 +1,7 @@
 import pygame as pg
 
+from assets import Assets
+
 class Mob(pg.sprite.Sprite):
     def __init__(self, world, glyph, max_hp, attack_power, defense_power):
         super().__init__()
@@ -20,10 +22,11 @@ class Mob(pg.sprite.Sprite):
             return
 
         if self.world.is_walkable(newx, newy):
+            Assets.step_sound.play()
             self.x = newx
             self.y = newy
         else:
-            print("wall bump")
+            Assets.bump_sound.play()
 
     def on_attack(self, attacker):
         attack_power = attacker.get_attack_power()
@@ -32,6 +35,7 @@ class Mob(pg.sprite.Sprite):
         self.hp -= damage
         if self.hp <= 0:
             self.kill()
+        Assets.hit_sound.play()
 
     def get_attack_power(self):
         return self.attack_power

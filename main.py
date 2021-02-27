@@ -3,6 +3,7 @@ from functools import lru_cache
 
 import pygame as pg
 
+from assets import Assets
 from mobs import Mob
 from world import Tile, TILE_SIZE, World
 
@@ -20,7 +21,7 @@ class Game:
         dt = 0
 
         # Load resources
-        self.talk_font = pg.font.Font("freesansbold.ttf", 32)
+        Assets.load_assets()
 
         self.new_game()
 
@@ -105,8 +106,8 @@ class Game:
 
             y = 40
             for line in self.talk_lines:
-                draw_text(surf, self.talk_font, line, 40, y)
-                y += self.talk_font.get_linesize()
+                draw_text(surf, Assets.talk_font, line, 40, y)
+                y += Assets.talk_font.get_linesize()
 
             pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
 
@@ -120,6 +121,7 @@ class Game:
         if tile == Tile.UP_STAIRS:
             self.world.new_level()
             self.world.add_mob_at(self.player, *self.world.start_pos)
+            Assets.up_stairs_sound.play()
 
 
 def draw_text(surf, font, text, x, y):
