@@ -1,6 +1,9 @@
+import random as rng
+
 import pygame as pg
 
 from assets import Assets
+from items import Item
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, world, tile_index, max_hp, attack_power, defense_power):
@@ -36,6 +39,10 @@ class Mob(pg.sprite.Sprite):
         self.hp -= damage
         if self.hp <= 0:
             self.kill()
+
+            # check if lizardman drops a sword
+            if self.tile_index == 8 and rng.random() < 0.2:
+                self.world.items.add(Item(9, self.x, self.y))
         Assets.hit_sound.play()
 
     def get_attack_power(self):
@@ -53,10 +60,24 @@ class Player(Mob):
         super().__init__(world, 4, 30, 5, 2)
         self.vision = 5.2
         self.spent_turn = False
+        self.has_sword = False
 
     def move(self, mx, my):
         super().move(mx, my)
         self.spent_turn = True
+
+        # try to pick up item when moving
+        item = self.world.get_item(self.x, self.y)
+        if item != None:
+            self.world.items.remove(item)
+            self.has_sword = True
+            Assets.powerup_sound.play()
+
+    def get_attack_power(self):
+        attack_power = super().get_attack_power()
+        if self.has_sword:
+            attack_power += 5
+        return attack_power
 
 
 class Lizardman(Mob):

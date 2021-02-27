@@ -115,6 +115,7 @@ class World:
         self.width = len(self.tiles[0])
         self.height = len(self.tiles)
         self.mobs = pg.sprite.Group()
+        self.items = pg.sprite.Group()
 
     def get_tile(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.height:
@@ -126,6 +127,12 @@ class World:
         for mob in self.mobs:
             if mob.x == x and mob.y == y:
                 return mob
+        return None
+
+    def get_item(self, x, y):
+        for item in self.items:
+            if item.x == x and item.y == y:
+                return item
         return None
 
     def get_image(self, x, y):
@@ -161,6 +168,13 @@ class World:
                 if rect.colliderect(surf.get_rect()) and player.can_see(x, y):
                     image = self.get_image(x, y)
                     surf.blit(image, rect)
+
+        # draw items
+        for item in self.items:
+            rect = pg.Rect(scroll_x + item.x*TILE_SIZE, scroll_y + item.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            if rect.colliderect(surf.get_rect()) and player.can_see(item.x, item.y):
+                image = self.tile_sheet.subsurface((item.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                surf.blit(image, rect)
 
         # draw mobs
         for mob in self.mobs:

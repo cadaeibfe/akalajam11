@@ -12,3 +12,4 @@ class Assets:
         Assets.bump_sound = pg.mixer.Sound("sounds/Hit_Hurt4.wav")
         Assets.hit_sound = pg.mixer.Sound("sounds/Hit_Hurt22.wav")
         Assets.up_stairs_sound = pg.mixer.Sound("sounds/Hit_Hurt3.wav")
+        Assets.powerup_sound = pg.mixer.Sound("sounds/Powerup6.wav")
