@@ -4,6 +4,7 @@ import pygame as pg
 
 from assets import Assets
 from items import Item
+from quest import Quest
 from world import Tile
 
 class Mob(pg.sprite.Sprite):
@@ -41,9 +42,15 @@ class Mob(pg.sprite.Sprite):
         if self.hp <= 0:
             self.kill()
 
-            # check if lizardman drops a sword
+            # lizardmen can drop the three treasures, in order
             if self.tile == Tile.LIZARD and rng.random() < 0.2:
-                self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+                if not Quest.has_sword:
+                    self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+                elif not Quest.has_shield:
+                    self.world.items.add(Item(Tile.SHIELD, self.x, self.y))
+                elif not Quest.has_crown:
+                    self.world.items.add(Item(Tile.CROWN, self.x, self.y))
+
         Assets.hit_sound.play()
 
     def get_attack_power(self):
@@ -61,7 +68,6 @@ class Player(Mob):
         super().__init__(world, Tile.HERO, 30, 5, 2)
         self.vision = 5.2
         self.spent_turn = False
-        self.has_sword = False
 
     def move(self, mx, my):
         super().move(mx, my)
@@ -71,15 +77,31 @@ class Player(Mob):
         item = self.world.get_item(self.x, self.y)
         if item != None:
             self.world.items.remove(item)
-            self.has_sword = True
-            self.tile = Tile.HERO_S
-            Assets.powerup_sound.play()
+
+            # check if picked item was one of the three treasures
+            if item.tile == Tile.SWORD:
+                Quest.has_sword = True
+                self.tile = Tile.HERO_S
+                Assets.powerup_sound.play()
+            elif item.tile == Tile.SHIELD:
+                Quest.has_shield = True
+                self.tile = Tile.HERO_SS
+                Assets.powerup_sound.play()
+            elif item.tile == Tile.CROWN:
+                Quest.has_crown = True
+                Assets.powerup_sound.play()
 
     def get_attack_power(self):
         attack_power = super().get_attack_power()
-        if self.has_sword:
+        if Quest.has_sword:
             attack_power += 5
         return attack_power
+
+    def get_defense_power(self):
+        defense_power = super().get_defense_power()
+        if Quest.has_shield:
+            defense_power += 5
+        return defense_power
 
 
 class Lizardman(Mob):

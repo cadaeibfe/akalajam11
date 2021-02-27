@@ -5,6 +5,7 @@ import pygame as pg
 
 from assets import Assets
 from mobs import Lizardman, Player
+from quest import Quest
 from world import Tile, TILE_SIZE, World
 
 
@@ -13,6 +14,7 @@ class State(Enum):
     PLAY = 1
     TALK = 2
     GAME_OVER = 3
+    WIN = 4
 
 
 class Game:
@@ -93,6 +95,10 @@ class Game:
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 self.state = State.TITLE
 
+        elif self.state == State.WIN:
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                self.state = State.TITLE
+
     def on_update(self, dt):
         if self.state == State.PLAY:
             if self.player.spent_turn:
@@ -118,6 +124,8 @@ class Game:
                 self.draw_text_box(surf)
             elif self.state == State.GAME_OVER:
                 self.draw_game_over_screen(surf)
+            elif self.state == State.WIN:
+                self.draw_win_screen(surf)
 
     def draw_ui(self, surf):
         draw_text(surf, Assets.talk_font, "HP", 10, 10)
@@ -144,7 +152,12 @@ class Game:
 
     def draw_game_over_screen(self, surf):
         draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-        draw_text(surf, Assets.talk_font, "Press [Space]", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+        draw_text(surf, Assets.talk_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+
+    def draw_win_screen(self, surf):
+        draw_text(surf, Assets.big_font, "You Win!", surf.get_width()//2, surf.get_height()//2 - 70, "center")
+        draw_text(surf, Assets.talk_font, "Thanks for playing!", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+        draw_text(surf, Assets.talk_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 100, "center")
 
     def talking_time(self, text, action):
         self.state = State.TALK
@@ -155,9 +168,15 @@ class Game:
         tile = self.world.get_tile(self.player.x, self.player.y)
         if tile == Tile.UP_STAIRS:
             Assets.up_stairs_sound.play()
-            self.world.new_level()
-            self.world.add_mob_at(self.player, *self.world.start_pos)
-            self.create_enemies()
+
+            # check if player is able to escape the tomb
+            if Quest.can_escape():
+                self.state = State.WIN
+            else:
+                # if not, just generate another level
+                self.world.new_level()
+                self.world.add_mob_at(self.player, *self.world.start_pos)
+                self.create_enemies()
 
 
 def draw_text(surf, font, text, x, y, anchor="topleft"):
