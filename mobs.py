@@ -30,7 +30,8 @@ class Mob(pg.sprite.Sprite):
 
         other = self.world.get_mob(newx, newy)
         if other != None:
-            other.on_attack(self)
+            if other.tile != self.tile:  # mobs only attack different kinds
+                self.attack(other)
             return
 
         if self.world.is_walkable(newx, newy):
@@ -40,16 +41,17 @@ class Mob(pg.sprite.Sprite):
         else:
             Assets.bump_sound.play()
 
-    def on_attack(self, attacker):
-        attack_power = attacker.get_attack_power()
-        defense_power = self.get_defense_power()
+    def attack(self, defender):
+        attack_power = self.get_attack_power()
+        defense_power = defender.get_defense_power()
         damage = max(1, attack_power - defense_power)
-        self.hp -= damage
-        if self.hp <= 0:
-            self.kill()
+        defender.hp -= damage
+        # print(f"{self} hits {defender} for {damage} damage")
+        if defender.hp <= 0:
+            defender.kill()
 
             # lizardmen can drop the three treasures, in order
-            if self.tile == Tile.LIZARD and rng.random() < 0.2:
+            if defender.tile == Tile.LIZARD and rng.random() < 0.2:
                 if not Quest.has_sword:
                     self.world.items.add(Item(Tile.SWORD, self.x, self.y))
                 elif not Quest.has_shield:
