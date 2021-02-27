@@ -148,3 +148,23 @@ class World:
         self.mobs.add(mob)
         mob.x = x
         mob.y = y
+
+    def draw(self, surf, player):
+        # calculate scroll so player will be in center
+        scroll_x = (surf.get_width() - TILE_SIZE) // 2 - player.x * TILE_SIZE
+        scroll_y = (surf.get_height() - TILE_SIZE) // 2 - player.y * TILE_SIZE
+
+        # draw tiles
+        for y in range(self.height):
+            for x in range(self.width):
+                rect = pg.Rect(scroll_x + x*TILE_SIZE, scroll_y + y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                if rect.colliderect(surf.get_rect()) and player.can_see(x, y):
+                    image = self.get_image(x, y)
+                    surf.blit(image, rect)
+
+        # draw mobs
+        for mob in self.mobs:
+            rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            if rect.colliderect(surf.get_rect()) and player.can_see(mob.x, mob.y):
+                image = self.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                surf.blit(image, rect)

@@ -25,7 +25,9 @@ class Game:
         # Load resources
         Assets.load_assets()
 
-        self.state = State.TITLE
+        # Show title screen when program starts
+        # self.state = State.TITLE
+        self.new_game() ##DEBUG
 
         # Main game loop
         while True:
@@ -107,51 +109,42 @@ class Game:
         surf.fill((32, 32, 32))
 
         if self.state == State.TITLE:
-            draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 150, "center")
-            draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 40, "center")
-            draw_text(surf, Assets.talk_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 150, "center")
-
+            self.draw_title_screen(surf)
         else:
-            # calculat scroll so player will be in center
-            scroll_x = (surf.get_width() - TILE_SIZE) // 2 - self.player.x * TILE_SIZE
-            scroll_y = (surf.get_height() - TILE_SIZE) // 2 - self.player.y * TILE_SIZE
-
-            # draw tiles
-            for y in range(self.world.height):
-                for x in range(self.world.width):
-                    rect = pg.Rect(scroll_x + x*TILE_SIZE, scroll_y + y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                    if rect.colliderect(surf.get_rect()) and self.player.can_see(x, y):
-                        image = self.world.get_image(x, y)
-                        surf.blit(image, rect)
-
-            # draw mobs
-            for mob in self.world.mobs:
-                rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                if rect.colliderect(surf.get_rect()) and self.player.can_see(mob.x, mob.y):
-                    image = self.world.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
-                    surf.blit(image, rect)
-
-            # draw ui
-            draw_text(surf, Assets.talk_font, "HP", 10, 10)
-            for i in range(self.player.max_hp):
-                color = (230, 41, 55) if i < self.player.hp else (245, 245, 245)
-                pg.draw.rect(surf, color, (62 + i*7, 12, 5, 26))
+            self.world.draw(surf, self.player)
+            self.draw_ui(surf)
 
             if self.state == State.TALK:
-                talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
-                pg.draw.rect(surf, (0, 0, 0), talk_rect)
-                pg.draw.rect(surf, (245, 245, 245), talk_rect, 1)
-
-                y = 40
-                for line in self.talk_lines:
-                    draw_text(surf, Assets.talk_font, line, 40, y)
-                    y += Assets.talk_font.get_linesize()
-
-                pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
-
+                self.draw_text_box(surf)
             elif self.state == State.GAME_OVER:
-                draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-                draw_text(surf, Assets.talk_font, "Press [Space]", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+                self.draw_game_over_screen(surf)
+
+    def draw_ui(self, surf):
+        draw_text(surf, Assets.talk_font, "HP", 10, 10)
+        for i in range(self.player.max_hp):
+            color = (230, 41, 55) if i < self.player.hp else (245, 245, 245)
+            pg.draw.rect(surf, color, (62 + i*7, 12, 5, 26))
+
+    def draw_talk_box(self, surf):
+        talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
+        pg.draw.rect(surf, (0, 0, 0), talk_rect)
+        pg.draw.rect(surf, (245, 245, 245), talk_rect, 1)
+
+        y = 40
+        for line in self.talk_lines:
+            draw_text(surf, Assets.talk_font, line, 40, y)
+            y += Assets.talk_font.get_linesize()
+
+        pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
+
+    def draw_title_screen(self, surf):
+        draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 150, "center")
+        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 40, "center")
+        draw_text(surf, Assets.talk_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 150, "center")
+
+    def draw_game_over_screen(self, surf):
+        draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")
+        draw_text(surf, Assets.talk_font, "Press [Space]", surf.get_width()//2, surf.get_height()//2 + 60, "center")
 
     def talking_time(self, text, action):
         self.state = State.TALK
