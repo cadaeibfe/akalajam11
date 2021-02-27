@@ -130,8 +130,8 @@ class World:
         # add enemies
         self.mobs = pg.sprite.Group()
         for i in range(5):
-            enemy = Mob(self, 6)
-            self.add_mob_at_random_empty_pos(enemy)
+            lizardman = Mob(self, 6, 10, 4, 0)
+            self.add_mob_at_random_empty_pos(lizardman)
 
     def get_tile(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.height:

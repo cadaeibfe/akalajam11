@@ -1,10 +1,14 @@
 import pygame as pg
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, world, glyph):
+    def __init__(self, world, glyph, max_hp, attack_power, defense_power):
         super().__init__()
         self.world = world
         self.glyph = glyph
+        self.max_hp = max_hp
+        self.hp = self.max_hp
+        self.attack_power = attack_power
+        self.defense_power = defense_power
 
     def move(self, mx, my):
         newx = self.x + mx
@@ -22,7 +26,18 @@ class Mob(pg.sprite.Sprite):
             print("wall bump")
 
     def on_attack(self, attacker):
-        self.kill()
+        attack_power = attacker.get_attack_power()
+        defense_power = self.get_defense_power()
+        damage = max(1, attack_power - defense_power)
+        self.hp -= damage
+        if self.hp <= 0:
+            self.kill()
+
+    def get_attack_power(self):
+        return self.attack_power
+
+    def get_defense_power(self):
+        return self.defense_power
 
 
 # class ArchAi:

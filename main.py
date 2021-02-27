@@ -42,7 +42,7 @@ class Game:
         self.state = State.PLAY
         self.world = World()
         # self.player = Mob(self.world, 3, 4, 15, None)
-        self.player = Mob(self.world, 4)
+        self.player = Mob(self.world, 4, 30, 5, 2)
         self.world.add_mob_at(self.player, *self.world.start_pos)
         # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
 
