@@ -46,21 +46,19 @@ class Mob(pg.sprite.Sprite):
         attack_power = self.get_attack_power()
         defense_power = defender.get_defense_power()
         damage = max(1, attack_power - defense_power)
-        defender.hp -= damage
-        self.factory.new_float_text(str(damage), defender.x, defender.y)
-        if defender.hp <= 0:
-            defender.kill()
-
-            # lizardmen can drop the three treasures, in order
-            if defender.tile == Tile.LIZARD and rng.random() < 0.2:
-                if not Quest.has_sword:
-                    self.world.items.add(Item(Tile.SWORD, defender.x, defender.y))
-                elif not Quest.has_shield:
-                    self.world.items.add(Item(Tile.SHIELD, defender.x, defender.y))
-                elif not Quest.has_crown:
-                    self.world.items.add(Item(Tile.CROWN, defender.x, defender.y))
-
+        defender.take_damage(damage)
         Assets.hit_sound.play()
+
+    def take_damage(self, damage):
+        self.hp -= damage
+        self.factory.new_float_text(str(damage), self.x, self.y)
+        if self.hp <= 0:
+            self.kill()
+            self.drop_loot()
+
+    def drop_loot(self):
+        # Drop nothing by default
+        pass
 
     def get_attack_power(self):
         return self.attack_power
@@ -70,6 +68,21 @@ class Mob(pg.sprite.Sprite):
 
     def can_see(self, x, y):
         return (self.x - x)**2 + (self.y - y)**2 <= self.vision**2
+
+    def wander(self):
+        choices = []
+        if self.world.is_walkable(self.x-1, self.y):
+            choices.append((-1, 0))
+        if self.world.is_walkable(self.x+1, self.y):
+            choices.append((1, 0))
+        if self.world.is_walkable(self.x, self.y-1):
+            choices.append((0, -1))
+        if self.world.is_walkable(self.x, self.y+1):
+            choices.append((0, 1))
+
+        if len(choices) > 0:
+            move = rng.choice(choices)
+            self.move(*move)
 
 
 class Player(Mob):
@@ -131,6 +144,46 @@ class Lizardman(Mob):
                 self.move(0, -1)
             elif dy > 0:
                 self.move(0, 1)
+
+    def drop_loot(self):
+        # lizardmen can drop the three treasures, in order
+        if rng.random() < 0.2:
+            if not Quest.has_sword:
+                self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+            elif not Quest.has_shield:
+                self.world.items.add(Item(Tile.SHIELD, self.x, self.y))
+            elif not Quest.has_crown:
+                self.world.items.add(Item(Tile.CROWN, self.x, self.y))
+            else:  # no more treasures, just drop a potion
+                self.world.items.add(Item(Tile.POTION, self.x, self.y))
+
+
+class Slime(Mob):
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):
+        super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
+
+    def update(self):
+        if rng.random() < 0.5:
+            self.wander()
+
+    def drop_loot(self):
+        if rng.random() < 0.4:
+            self.world.items.add(Item(Tile.POTION, self.x, self.y))
+
+
+class Bat(Mob):
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):
+        super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
+
+    def update(self):
+        self.wander()
+        self.wander()
+
+    def drop_loot(self):
+        # Bats are harder so have higher chance to drop a potion
+        if rng.random() < 0.8:
+            self.world.items.add(Item(Tile.POTION, self.x, self.y))
+
 
 # class ArchAi:
 #     def __init__(self, game):

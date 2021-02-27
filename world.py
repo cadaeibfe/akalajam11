@@ -17,9 +17,13 @@ class Tile(Enum):
     SKULL = 7
     ARCH = 8
     LIZARD = 9
-    SWORD = 10
-    SHIELD = 11
-    CROWN = 12
+    LIZARDKING = 10
+    SLIME = 11
+    BAT = 12
+    SWORD = 13
+    SHIELD = 14
+    CROWN = 15
+    POTION = 16
 
 
 class MazeGenerator:

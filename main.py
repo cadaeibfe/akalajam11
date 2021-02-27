@@ -1,10 +1,11 @@
 from enum import Enum
 from functools import lru_cache
+import random as rng
 
 import pygame as pg
 
 from assets import Assets, TILE_SIZE
-from mobs import Lizardman, Player
+from mobs import Bat, Lizardman, Player, Slime
 from quest import Quest
 from world import Tile, World
 
@@ -58,9 +59,17 @@ class Game:
         self.world.add_mob_at(self.player, *self.world.start_pos)
 
     def create_enemies(self):
-        for i in range(5):
-            lizardman = Lizardman(self.world, self, Tile.LIZARD, 10, 4, 0, self.player)
-            self.world.add_mob_at_random_empty_pos(lizardman)
+        for i in range(6):
+            t = rng.randrange(0, 3)
+            if t == 0:
+                lizardman = Lizardman(self.world, self, Tile.LIZARD, 10, 4, 0, self.player)
+                self.world.add_mob_at_random_empty_pos(lizardman)
+            elif t == 1:
+                slime = Slime(self.world, self, Tile.SLIME, 5, 1, 0)
+                self.world.add_mob_at_random_empty_pos(slime)
+            elif t == 2:
+                bat = Bat(self.world, self, Tile.BAT, 10, 2, 0)
+                self.world.add_mob_at_random_empty_pos(bat)
 
     def new_float_text(self, text, x, y):
         self.float_group.add(FloatText(text, x, y))
