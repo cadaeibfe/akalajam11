@@ -4,7 +4,7 @@ from functools import lru_cache
 import pygame as pg
 
 from assets import Assets
-from mobs import Player
+from mobs import Lizardman, Player
 from world import Tile, TILE_SIZE, World
 
 
@@ -42,9 +42,18 @@ class Game:
     def new_game(self):
         self.state = State.PLAY
         self.world = World()
+        self.new_player()
+        self.create_enemies()
+        # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
+
+    def new_player(self):
         self.player = Player(self.world)
         self.world.add_mob_at(self.player, *self.world.start_pos)
-        # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
+
+    def create_enemies(self):
+        for i in range(5):
+            lizardman = Lizardman(self.world, 6, 10, 4, 0, self.player)
+            self.world.add_mob_at_random_empty_pos(lizardman)
 
     def on_event(self, event):
         if self.state == State.PLAY:
@@ -72,7 +81,9 @@ class Game:
                         self.talk_action()
 
     def on_update(self, dt):
-        pass
+        if self.player.spent_turn:
+            self.world.mobs.update()
+            self.player.spent_turn = False
 
     def on_draw(self, surf):
         surf.fill((32, 32, 32))
@@ -93,7 +104,7 @@ class Game:
         for mob in self.world.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and self.player.can_see(mob.x, mob.y):
-                image = self.world.tile_sheet.subsurface((mob.glyph*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = self.world.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
 
         if self.state == State.TALK:
@@ -116,9 +127,10 @@ class Game:
     def up_stairs(self):
         tile = self.world.get_tile(self.player.x, self.player.y)
         if tile == Tile.UP_STAIRS:
+            Assets.up_stairs_sound.play()
             self.world.new_level()
             self.world.add_mob_at(self.player, *self.world.start_pos)
-            Assets.up_stairs_sound.play()
+            self.create_enemies()
 
 
 def draw_text(surf, font, text, x, y):

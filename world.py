@@ -3,8 +3,6 @@ import random as rng
 
 import pygame as pg
 
-from mobs import Mob
-
 TILE_SIZE = 32
 
 
@@ -126,12 +124,7 @@ class World:
         self.tiles, self.start_pos = self.generator.generate(20, 20)
         self.width = len(self.tiles[0])
         self.height = len(self.tiles)
-
-        # add enemies
         self.mobs = pg.sprite.Group()
-        for i in range(5):
-            lizardman = Mob(self, 6, 10, 4, 0)
-            self.add_mob_at_random_empty_pos(lizardman)
 
     def get_tile(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.height:
