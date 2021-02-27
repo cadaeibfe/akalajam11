@@ -11,6 +11,7 @@ from world import Tile, TILE_SIZE, World
 class State(Enum):
     PLAY = 1
     TALK = 2
+    GAME_OVER = 3
 
 
 class Game:
@@ -83,7 +84,11 @@ class Game:
 
     def on_update(self, dt):
         if self.player.spent_turn:
-            self.world.mobs.update()
+            for mob in self.world.mobs:
+                mob.update()
+                if not self.player.alive():
+                    self.state = State.GAME_OVER
+                    break
             self.player.spent_turn = False
 
     def on_draw(self, surf):
@@ -126,6 +131,9 @@ class Game:
 
             pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
 
+        elif self.state == State.GAME_OVER:
+            draw_text(surf, Assets.big_font, "GAME OVER", surf.get_width()//2, surf.get_height()//2, "center")
+
     def talking_time(self, text, action):
         self.state = State.TALK
         self.talk_lines = text.split('\n')
@@ -140,9 +148,9 @@ class Game:
             self.create_enemies()
 
 
-def draw_text(surf, font, text, x, y):
+def draw_text(surf, font, text, x, y, anchor="topleft"):
     text_surf = render_text(font, text, (245, 245, 245))
-    text_rect = text_surf.get_rect(topleft = (x, y))
+    text_rect = text_surf.get_rect(**{anchor: (x, y)})
     surf.blit(text_surf, text_rect)
 
 @lru_cache

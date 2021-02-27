@@ -4,6 +4,7 @@ class Assets:
     @staticmethod
     def load_assets():
         # fonts
+        Assets.big_font = pg.font.Font("freesansbold.ttf", 100)
         Assets.talk_font = pg.font.Font("freesansbold.ttf", 32)
 
         # sounds
