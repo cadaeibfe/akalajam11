@@ -3,6 +3,8 @@ import random as rng
 
 import pygame as pg
 
+from assets import Assets
+
 TILE_SIZE = 60
 
 
@@ -107,8 +109,6 @@ class World:
         self.generator = MazeGenerator()
         self.new_level()
 
-        self.tile_sheet = pg.image.load("images/tile_sheet.png").convert()
-        self.tile_sheet = pg.transform.scale(self.tile_sheet, (self.tile_sheet.get_width()*3, self.tile_sheet.get_height()*3))
 
     def new_level(self):
         self.tiles, self.start_pos = self.generator.generate(20, 20)
@@ -137,7 +137,7 @@ class World:
 
     def get_image(self, x, y):
         tile = self.get_tile(x, y)
-        return self.tile_sheet.subsurface(((tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+        return Assets.tile_sheet.subsurface(((tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
 
     def is_walkable(self, x, y):
         tile = self.get_tile(x, y)
@@ -173,12 +173,12 @@ class World:
         for item in self.items:
             rect = pg.Rect(scroll_x + item.x*TILE_SIZE, scroll_y + item.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(item.x, item.y):
-                image = self.tile_sheet.subsurface((item.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.tile_sheet.subsurface((item.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
 
         # draw mobs
         for mob in self.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(mob.x, mob.y):
-                image = self.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
