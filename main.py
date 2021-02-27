@@ -62,7 +62,7 @@ class Game:
         for i in range(6):
             t = rng.randrange(0, 3)
             if t == 0:
-                lizardman = Lizardman(self.world, self, Tile.LIZARD, 10, 4, 0, self.player)
+                lizardman = Lizardman(self.world, self, Tile.LIZARD, 15, 4, 1, self.player)
                 self.world.add_mob_at_random_empty_pos(lizardman)
             elif t == 1:
                 slime = Slime(self.world, self, Tile.SLIME, 5, 1, 0)
@@ -71,8 +71,8 @@ class Game:
                 bat = Bat(self.world, self, Tile.BAT, 10, 2, 0)
                 self.world.add_mob_at_random_empty_pos(bat)
 
-    def new_float_text(self, text, x, y):
-        self.float_group.add(FloatText(text, x, y))
+    def new_float_text(self, text, x, y, color):
+        self.float_group.add(FloatText(text, x, y, color))
 
     def on_event(self, event):
         if self.state == State.TITLE:
@@ -229,9 +229,9 @@ class Game:
 
 class FloatText(pg.sprite.Sprite):
     """ Displays some floating text in the play field. """
-    def __init__(self, text, x, y):
+    def __init__(self, text, x, y, color):
         super().__init__()
-        self.image = render_text(Assets.damage_font, text, (245, 245, 245))
+        self.image = render_text(Assets.damage_font, text, color)
         self.x = x
         self.y = y
         self.duration = 300

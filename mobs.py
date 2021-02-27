@@ -51,7 +51,7 @@ class Mob(pg.sprite.Sprite):
 
     def take_damage(self, damage):
         self.hp -= damage
-        self.factory.new_float_text(str(damage), self.x, self.y)
+        self.factory.new_float_text(f"-{damage}", self.x, self.y, (250, 61, 75))
         if self.hp <= 0:
             self.kill()
             self.drop_loot()
@@ -87,7 +87,7 @@ class Mob(pg.sprite.Sprite):
 
 class Player(Mob):
     def __init__(self, world, factory):
-        super().__init__(world, factory, Tile.HERO, 30, 5, 2)
+        super().__init__(world, factory, Tile.HERO, 30, 5, 0)
         self.vision = 5.2
         self.spent_turn = False
 
@@ -112,6 +112,15 @@ class Player(Mob):
             elif item.tile == Tile.CROWN:
                 Quest.has_crown = True
                 Assets.powerup_sound.play()
+            
+            # check if picked item is a potion
+            elif item.tile == Tile.POTION:
+                heal = 10
+                self.hp += heal
+                if self.hp > self.max_hp:
+                    self.hp = self.max_hp
+                self.factory.new_float_text(f"+{heal}", self.x, self.y, (0, 228, 48))
+                Assets.heal_sound.play()
 
     def get_attack_power(self):
         attack_power = super().get_attack_power()
