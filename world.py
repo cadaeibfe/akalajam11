@@ -163,7 +163,10 @@ class World:
         mob.x = x
         mob.y = y
 
-    def draw(self, surf, player):
+    def draw(self, surf, player, ui_size):
+        # leave some space at the top for ui
+        draw_rect = pg.Rect(0, ui_size, surf.get_width(), surf.get_height() - ui_size)
+
         # calculate scroll so player will be in center
         scroll_x = (surf.get_width() - TILE_SIZE) // 2 - player.x * TILE_SIZE
         scroll_y = (surf.get_height() - TILE_SIZE) // 2 - player.y * TILE_SIZE
@@ -172,20 +175,20 @@ class World:
         for y in range(self.height):
             for x in range(self.width):
                 rect = pg.Rect(scroll_x + x*TILE_SIZE, scroll_y + y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                if rect.colliderect(surf.get_rect()) and player.can_see(x, y):
+                if rect.colliderect(draw_rect) and player.can_see(x, y):
                     image = self.get_image(x, y)
                     surf.blit(image, rect)
 
         # draw items
         for item in self.items:
             rect = pg.Rect(scroll_x + item.x*TILE_SIZE, scroll_y + item.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            if rect.colliderect(surf.get_rect()) and player.can_see(item.x, item.y):
+            if rect.colliderect(draw_rect) and player.can_see(item.x, item.y):
                 image = Assets.get_tile_image(item.tile)
                 surf.blit(image, rect)
 
         # draw mobs
         for mob in self.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            if rect.colliderect(surf.get_rect()) and player.can_see(mob.x, mob.y):
+            if rect.colliderect(draw_rect) and player.can_see(mob.x, mob.y):
                 image = Assets.get_tile_image(mob.tile, mob.flip_h)
                 surf.blit(image, rect)

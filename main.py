@@ -119,13 +119,14 @@ class Game:
                 self.player.spent_turn = False
 
     def on_draw(self, surf):
-        surf.fill((32, 32, 32))
+        ui_size = 40
+        surf.fill((0, 0, 0))
 
         if self.state == State.TITLE:
             self.draw_title_screen(surf)
         else:
-            self.world.draw(surf, self.player)
-            self.draw_ui(surf)
+            self.world.draw(surf, self.player, ui_size)
+            self.draw_ui(surf, ui_size)
 
             if self.state == State.TALK:
                 self.draw_text_box(surf)
@@ -134,11 +135,25 @@ class Game:
             elif self.state == State.WIN:
                 self.draw_win_screen(surf)
 
-    def draw_ui(self, surf):
-        draw_text(surf, Assets.talk_font, "HP", 10, 10)
+    def draw_ui(self, surf, ui_size):
+        pg.draw.rect(surf, (32, 32, 32), (0, 0, surf.get_width(), ui_size))
+
+        # draw health bar
+        draw_text(surf, Assets.small_font, "HP:", 10, 11)
         for i in range(self.player.max_hp):
             color = (230, 41, 55) if i < self.player.hp else (245, 245, 245)
-            pg.draw.rect(surf, color, (62 + i*7, 12, 5, 26))
+            pg.draw.rect(surf, color, (50 + i*7, 10, 5, 20))
+
+        # draw quest items collected
+        draw_text(surf, Assets.small_font, "Items:", 300, 11)
+        if Quest.has_sword:
+            surf.blit(Assets.tile_sheet_small.subsurface((Tile.SWORD.value*20, 0, 20, 20)), (370, 10))
+        if Quest.has_shield:
+            surf.blit(Assets.tile_sheet_small.subsurface((Tile.SHIELD.value*20, 0, 20, 20)), (400, 10))
+        if Quest.has_crown:
+            surf.blit(Assets.tile_sheet_small.subsurface((Tile.CROWN.value*20, 0, 20, 20)), (430, 10))
+
+        pg.draw.line(surf, (245, 245, 245), (0, ui_size), (surf.get_width(), ui_size))
 
     def draw_talk_box(self, surf):
         talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)

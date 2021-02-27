@@ -8,11 +8,12 @@ class Assets:
         # fonts
         Assets.big_font = pg.font.Font("freesansbold.ttf", 100)
         Assets.talk_font = pg.font.Font("freesansbold.ttf", 32)
+        Assets.small_font = pg.font.Font("freesansbold.ttf", 20)
 
         # images
-        Assets.tile_sheet = pg.image.load("images/tile_sheet.png").convert()
-        Assets.tile_sheet = pg.transform.scale(Assets.tile_sheet, (Assets.tile_sheet.get_width()*3, Assets.tile_sheet.get_height()*3))
-        Assets.tile_sheet_flip_h = pg.transform.flip(Assets.tile_sheet, True, False)
+        Assets.tile_sheet_small = pg.image.load("images/tile_sheet.png").convert()   # save original size image for ui icons
+        Assets.tile_sheet = pg.transform.scale(Assets.tile_sheet_small, (Assets.tile_sheet_small.get_width()*3, Assets.tile_sheet_small.get_height()*3))
+        Assets.tile_sheet_flipped = pg.transform.flip(Assets.tile_sheet, True, False)
 
         # sounds
         Assets.step_sound = pg.mixer.Sound("sounds/Hit_Hurt5.wav")
@@ -27,6 +28,6 @@ class Assets:
     @staticmethod
     def get_tile_image(tile, flip_h=False):
         if flip_h:
-            return Assets.tile_sheet_flip_h.subsurface((Assets.tile_sheet_flip_h.get_width() - (tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+            return Assets.tile_sheet_flipped.subsurface((Assets.tile_sheet_flipped.get_width() - (tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
         else:
             return Assets.tile_sheet.subsurface((tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
