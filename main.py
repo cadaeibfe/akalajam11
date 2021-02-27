@@ -193,6 +193,7 @@ class Game:
 
             # check if player is able to escape the tomb
             if Quest.can_escape():
+                self.player.kill()  # make player sprite disappear so it looks like they went up the stairs
                 Assets.win_sound.play()
                 self.state = State.WIN
             else:
