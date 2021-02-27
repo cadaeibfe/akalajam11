@@ -56,7 +56,7 @@ class Game:
 
     def create_enemies(self):
         for i in range(5):
-            lizardman = Lizardman(self.world, 8, 10, 4, 0, self.player)
+            lizardman = Lizardman(self.world, Tile.LIZARD, 10, 4, 0, self.player)
             self.world.add_mob_at_random_empty_pos(lizardman)
 
     def on_event(self, event):
@@ -99,7 +99,7 @@ class Game:
                 for mob in self.world.mobs:
                     mob.update()
                     if not self.player.alive():
-                        self.player.tile_index = 6
+                        self.player.tile = Tile.SKULL
                         self.world.mobs.add(self.player)
                         self.state = State.GAME_OVER
                         break

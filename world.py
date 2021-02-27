@@ -9,10 +9,19 @@ TILE_SIZE = 60
 
 
 class Tile(Enum):
-    OUT_OF_BOUNDS = -1
-    FLOOR = 0
-    WALL = 1
-    UP_STAIRS = 2
+    OUT_OF_BOUNDS = 0
+    FLOOR = 1
+    WALL = 2
+    UP_STAIRS = 3
+    HERO = 4
+    HERO_S = 5
+    HERO_SS = 6
+    SKULL = 7
+    ARCH = 8
+    LIZARD = 9
+    SWORD = 10
+    SHIELD = 11
+    CROWN = 12
 
 
 class MazeGenerator:
@@ -137,7 +146,7 @@ class World:
 
     def get_image(self, x, y):
         tile = self.get_tile(x, y)
-        return Assets.tile_sheet.subsurface(((tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+        return Assets.tile_sheet.subsurface((tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
 
     def is_walkable(self, x, y):
         tile = self.get_tile(x, y)
@@ -173,12 +182,12 @@ class World:
         for item in self.items:
             rect = pg.Rect(scroll_x + item.x*TILE_SIZE, scroll_y + item.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(item.x, item.y):
-                image = Assets.tile_sheet.subsurface((item.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.tile_sheet.subsurface((item.tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
 
         # draw mobs
         for mob in self.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if rect.colliderect(surf.get_rect()) and player.can_see(mob.x, mob.y):
-                image = Assets.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                image = Assets.tile_sheet.subsurface((mob.tile.value*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
