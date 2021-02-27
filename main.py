@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import pygame as pg
 
-from assets import Assets
+from assets import Assets, TILE_SIZE
 from mobs import Lizardman, Player
 from quest import Quest
 from world import Tile, World
@@ -46,6 +46,7 @@ class Game:
             dt = clock.tick(60)
 
     def new_game(self):
+        self.float_group = pg.sprite.Group()  # used to draw floating damage numbers
         self.state = State.PLAY
         self.world = World()
         self.new_player()
@@ -53,13 +54,16 @@ class Game:
         # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
 
     def new_player(self):
-        self.player = Player(self.world)
+        self.player = Player(self.world, self)
         self.world.add_mob_at(self.player, *self.world.start_pos)
 
     def create_enemies(self):
         for i in range(5):
-            lizardman = Lizardman(self.world, Tile.LIZARD, 10, 4, 0, self.player)
+            lizardman = Lizardman(self.world, self, Tile.LIZARD, 10, 4, 0, self.player)
             self.world.add_mob_at_random_empty_pos(lizardman)
+
+    def new_float_text(self, text, x, y):
+        self.float_group.add(FloatText(text, x, y))
 
     def on_event(self, event):
         if self.state == State.TITLE:
@@ -104,6 +108,8 @@ class Game:
 
     def on_update(self, dt):
         if self.state == State.PLAY:
+            self.float_group.update(dt)  # make damage text disappear after a moment
+
             if self.player.spent_turn:
                 for mob in self.world.mobs:
                     mob.update()
@@ -127,6 +133,7 @@ class Game:
         else:
             self.world.draw(surf, self.player, ui_size)
             self.draw_ui(surf, ui_size)
+            self.draw_damage_text(surf)
 
             if self.state == State.TALK:
                 self.draw_text_box(surf)
@@ -154,6 +161,14 @@ class Game:
             surf.blit(Assets.tile_sheet_small.subsurface((Tile.CROWN.value*20, 0, 20, 20)), (430, 10))
 
         pg.draw.line(surf, (245, 245, 245), (0, ui_size), (surf.get_width(), ui_size))
+
+    def draw_damage_text(self, surf):
+        scroll_x = (surf.get_width() - TILE_SIZE) // 2 - self.player.x * TILE_SIZE
+        scroll_y = (surf.get_height() - TILE_SIZE) // 2 - self.player.y * TILE_SIZE
+        for float_text in self.float_group:
+            rect = float_text.image.get_rect()
+            rect.center = (scroll_x + float_text.x*TILE_SIZE + TILE_SIZE/2, scroll_y + float_text.y*TILE_SIZE + TILE_SIZE/2 + float_text.y_offset)
+            surf.blit(float_text.image, rect)
 
     def draw_talk_box(self, surf):
         talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
@@ -201,6 +216,24 @@ class Game:
                 self.world.new_level()
                 self.world.add_mob_at(self.player, *self.world.start_pos)
                 self.create_enemies()
+
+
+class FloatText(pg.sprite.Sprite):
+    """ Displays some floating text in the play field. """
+    def __init__(self, text, x, y):
+        super().__init__()
+        self.image = render_text(Assets.damage_font, text, (245, 245, 245))
+        self.x = x
+        self.y = y
+        self.duration = 300
+        self.y_offset = 0
+
+    def update(self, dt):
+        self.y_offset -= 1  # rising animation
+
+        self.duration -= dt
+        if self.duration <= 0:
+            self.kill()
 
 
 def draw_text(surf, font, text, x, y, anchor="topleft"):

@@ -7,6 +7,7 @@ class Assets:
     def load_assets():
         # fonts
         Assets.big_font = pg.font.Font("freesansbold.ttf", 100)
+        Assets.damage_font = pg.font.Font("freesansbold.ttf", 44)
         Assets.talk_font = pg.font.Font("freesansbold.ttf", 32)
         Assets.small_font = pg.font.Font("freesansbold.ttf", 20)
 

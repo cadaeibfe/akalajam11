@@ -8,9 +8,10 @@ from quest import Quest
 from world import Tile
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, world, tile, max_hp, attack_power, defense_power):
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):
         super().__init__()
         self.world = world
+        self.factory = factory
         self.tile = tile
         self.max_hp = max_hp
         self.hp = self.max_hp
@@ -46,18 +47,18 @@ class Mob(pg.sprite.Sprite):
         defense_power = defender.get_defense_power()
         damage = max(1, attack_power - defense_power)
         defender.hp -= damage
-        # print(f"{self} hits {defender} for {damage} damage")
+        self.factory.new_float_text(str(damage), defender.x, defender.y)
         if defender.hp <= 0:
             defender.kill()
 
             # lizardmen can drop the three treasures, in order
             if defender.tile == Tile.LIZARD and rng.random() < 0.2:
                 if not Quest.has_sword:
-                    self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+                    self.world.items.add(Item(Tile.SWORD, defender.x, defender.y))
                 elif not Quest.has_shield:
-                    self.world.items.add(Item(Tile.SHIELD, self.x, self.y))
+                    self.world.items.add(Item(Tile.SHIELD, defender.x, defender.y))
                 elif not Quest.has_crown:
-                    self.world.items.add(Item(Tile.CROWN, self.x, self.y))
+                    self.world.items.add(Item(Tile.CROWN, defender.x, defender.y))
 
         Assets.hit_sound.play()
 
@@ -72,8 +73,8 @@ class Mob(pg.sprite.Sprite):
 
 
 class Player(Mob):
-    def __init__(self, world):
-        super().__init__(world, Tile.HERO, 30, 5, 2)
+    def __init__(self, world, factory):
+        super().__init__(world, factory, Tile.HERO, 30, 5, 2)
         self.vision = 5.2
         self.spent_turn = False
 
@@ -113,8 +114,8 @@ class Player(Mob):
 
 
 class Lizardman(Mob):
-    def __init__(self, world, tile_index, max_hp, attack_power, defense_power, target):
-        super().__init__(world, tile_index, max_hp, attack_power, defense_power)
+    def __init__(self, world, factory, tile, max_hp, attack_power, defense_power, target):
+        super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
         self.target = target
         self.vision = 4
 
