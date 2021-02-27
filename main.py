@@ -108,6 +108,12 @@ class Game:
                 image = self.world.tile_sheet.subsurface((mob.tile_index*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
                 surf.blit(image, rect)
 
+        # draw ui
+        draw_text(surf, Assets.talk_font, "HP", 10, 10)
+        for i in range(self.player.max_hp):
+            color = (230, 41, 55) if i < self.player.hp else (245, 245, 245)
+            pg.draw.rect(surf, color, (62 + i*7, 12, 5, 26))
+
         if self.state == State.TALK:
             talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
             pg.draw.rect(surf, (0, 0, 0), talk_rect)
