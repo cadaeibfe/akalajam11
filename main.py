@@ -63,7 +63,8 @@ class Game:
 
     def on_event(self, event):
         if self.state == State.TITLE:
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_RETURN):
+                Assets.select_sound.play()
                 self.new_game()
 
         elif self.state == State.PLAY:
@@ -92,11 +93,13 @@ class Game:
                         self.talk_action()
 
         elif self.state == State.GAME_OVER:
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_RETURN):
+                Assets.select_sound.play()
                 self.state = State.TITLE
 
         elif self.state == State.WIN:
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_RETURN):
+                Assets.select_sound.play()
                 self.state = State.TITLE
 
     def on_update(self, dt):
@@ -104,11 +107,15 @@ class Game:
             if self.player.spent_turn:
                 for mob in self.world.mobs:
                     mob.update()
+
+                    # check if player was killed by last mob action
                     if not self.player.alive():
                         self.player.tile = Tile.SKULL
                         self.world.mobs.add(self.player)
                         self.state = State.GAME_OVER
+                        Assets.game_over_sound.play()
                         break
+
                 self.player.spent_turn = False
 
     def on_draw(self, surf):
@@ -171,6 +178,7 @@ class Game:
 
             # check if player is able to escape the tomb
             if Quest.can_escape():
+                Assets.win_sound.play()
                 self.state = State.WIN
             else:
                 # if not, just generate another level

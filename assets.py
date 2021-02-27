@@ -20,6 +20,9 @@ class Assets:
         Assets.hit_sound = pg.mixer.Sound("sounds/Hit_Hurt22.wav")
         Assets.up_stairs_sound = pg.mixer.Sound("sounds/Hit_Hurt3.wav")
         Assets.powerup_sound = pg.mixer.Sound("sounds/Powerup6.wav")
+        Assets.select_sound = pg.mixer.Sound("sounds/Blip_Select6.wav")
+        Assets.game_over_sound = pg.mixer.Sound("sounds/Randomize39.wav")
+        Assets.win_sound = pg.mixer.Sound("sounds/Powerup19.wav")
 
     @staticmethod
     def get_tile_image(tile, flip_h=False):
