@@ -44,6 +44,15 @@ class Mob(pg.sprite.Sprite):
         return self.defense_power
 
 
+class Player(Mob):
+    def __init__(self, world):
+        super().__init__(world, 4, 30, 5, 2)
+        self.vision = 5.2
+
+    def can_see(self, x, y):
+        return (self.x - x)**2 + (self.y - y)**2 <= self.vision**2
+
+
 # class ArchAi:
 #     def __init__(self, game):
 #         self.game = game

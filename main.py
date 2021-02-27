@@ -4,7 +4,7 @@ from functools import lru_cache
 import pygame as pg
 
 from assets import Assets
-from mobs import Mob
+from mobs import Player
 from world import Tile, TILE_SIZE, World
 
 
@@ -42,8 +42,7 @@ class Game:
     def new_game(self):
         self.state = State.PLAY
         self.world = World()
-        # self.player = Mob(self.world, 3, 4, 15, None)
-        self.player = Mob(self.world, 4, 30, 5, 2)
+        self.player = Player(self.world)
         self.world.add_mob_at(self.player, *self.world.start_pos)
         # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
 
@@ -86,18 +85,16 @@ class Game:
         for y in range(self.world.height):
             for x in range(self.world.width):
                 rect = pg.Rect(scroll_x + x*TILE_SIZE, scroll_y + y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                if not rect.colliderect(surf.get_rect()): continue
-
-                image = self.world.get_image(x, y)
-                surf.blit(image, rect)
+                if rect.colliderect(surf.get_rect()) and self.player.can_see(x, y):
+                    image = self.world.get_image(x, y)
+                    surf.blit(image, rect)
 
         # draw mobs
         for mob in self.world.mobs:
             rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            if not rect.colliderect(surf.get_rect()): continue
-
-            image = self.world.tile_sheet.subsurface((mob.glyph*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
-            surf.blit(image, rect)
+            if rect.colliderect(surf.get_rect()) and self.player.can_see(mob.x, mob.y):
+                image = self.world.tile_sheet.subsurface((mob.glyph*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+                surf.blit(image, rect)
 
         if self.state == State.TALK:
             talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
