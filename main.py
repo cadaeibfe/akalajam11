@@ -154,7 +154,7 @@ class World:
         for i in range(100):
             x = rng.randrange(0, self.width)
             y = rng.randrange(0, self.height)
-            if self.is_walkable(x, y) and (x, y) not in self.mobs:
+            if (x, y) != self.start_pos and self.is_walkable(x, y) and self.get_mob(x, y) == None:
                 self.add_mob_at(mob, x, y)
                 break
 
