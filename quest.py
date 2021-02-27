@@ -1,7 +1,9 @@
 class Quest:
-    has_sword = False
-    has_shield = False
-    has_crown = False
+    @staticmethod
+    def reset():
+        Quest.has_sword = False
+        Quest.has_shield = False
+        Quest.has_crown = False
 
     @staticmethod
     def can_escape():

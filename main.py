@@ -47,6 +47,7 @@ class Game:
             dt = clock.tick(60)
 
     def new_game(self):
+        Quest.reset()
         self.float_group = pg.sprite.Group()  # used to draw floating damage numbers
         self.state = State.PLAY
         self.world = World()
