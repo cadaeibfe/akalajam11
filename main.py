@@ -53,7 +53,7 @@ class MazeGenerator:
         start_room = rng.choice(rooms)
         start_pos = self.random_room_pos(start_room)
 
-        return self.tiles, up_stairs_pos, start_pos
+        return self.tiles, start_pos
 
     def random_room_pos(self, r):
         return (rng.randrange(r.left, r.right), rng.randrange(r.top, r.bottom))
@@ -104,11 +104,7 @@ class World:
         #               [1, 1, 1, 1, 0, 1, 1, 1, 1],
         #               [1, 1, 1, 1, 1, 1, 1, 1, 1]]
         self.generator = MazeGenerator()
-        self.tiles, self.up_stairs_pos, self.start_pos = self.generator.generate(20, 20)
-        self.width = len(self.tiles[0])
-        self.height = len(self.tiles)
-
-        self.mobs = {}
+        self.new_level()
 
         self.tile_sheet = pg.Surface((384, 64))
         self.tile_sheet.set_colorkey((0, 0, 0))
@@ -121,7 +117,18 @@ class World:
         pg.draw.line(self.tile_sheet, (235, 235, 235), (3.75*TILE_SIZE, TILE_SIZE-10), (3.25*TILE_SIZE, 0.5*TILE_SIZE), 5)
         pg.draw.rect(self.tile_sheet, (0, 121, 241), (4*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))        # player
         pg.draw.rect(self.tile_sheet, (0, 228, 48), (5*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))         # archaeologist
+        pg.draw.rect(self.tile_sheet, (230, 41, 55), (6*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))        # lizardman
 
+    def new_level(self):
+        self.tiles, self.start_pos = self.generator.generate(20, 20)
+        self.width = len(self.tiles[0])
+        self.height = len(self.tiles)
+
+        # add enemies
+        self.mobs = pg.sprite.Group()
+        for i in range(5):
+            enemy = Mob(self, 6)
+            self.add_mob_at_random_empty_pos(enemy)
 
     def get_tile(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.height:
@@ -130,13 +137,12 @@ class World:
             return Tile.OUT_OF_BOUNDS
 
     def get_mob(self, x, y):
-        return self.mobs.get((x, y))
+        for mob in self.mobs:
+            if mob.x == x and mob.y == y:
+                return mob
+        return None
 
     def get_image(self, x, y):
-        mob = self.get_mob(x, y)
-        if mob != None:
-            return self.tile_sheet.subsurface(mob.glyph*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE)
-
         tile = self.get_tile(x, y)
         return self.tile_sheet.subsurface(((tile.value+1)*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
 
@@ -144,24 +150,25 @@ class World:
         tile = self.get_tile(x, y)
         return tile == Tile.FLOOR or tile == Tile.UP_STAIRS
 
+    def add_mob_at_random_empty_pos(self, mob):
+        for i in range(100):
+            x = rng.randrange(0, self.width)
+            y = rng.randrange(0, self.height)
+            if self.is_walkable(x, y) and (x, y) not in self.mobs:
+                self.add_mob_at(mob, x, y)
+                break
+
     def add_mob_at(self, mob, x, y):
-        self.mobs[(x, y)] = mob
-
-    def on_mob_move(self, oldx, oldy, newx, newy):
-        mob = self.mobs.pop((oldx, oldy))
-        self.mobs[(newx, newy)] = mob
+        self.mobs.add(mob)
+        mob.x = x
+        mob.y = y
 
 
-class Mob:
-    def __init__(self, world, glyph, x, y, ai):
+class Mob(pg.sprite.Sprite):
+    def __init__(self, world, glyph):
+        super().__init__()
         self.world = world
-        self.world.add_mob_at(self, x, y)
         self.glyph = glyph
-        self.x = x
-        self.y = y
-        self.ai = ai
-        if self.ai != None:
-            self.ai.owner = self
 
     def move(self, mx, my):
         newx = self.x + mx
@@ -169,11 +176,10 @@ class Mob:
 
         other = self.world.get_mob(newx, newy)
         if other != None:
-            other.ai.on_bump()
+            other.on_attack(self)
             return
 
         if self.world.is_walkable(newx, newy):
-            self.world.on_mob_move(self.x, self.y, newx, newy)
             self.x = newx
             self.y = newy
         else:
@@ -182,11 +188,11 @@ class Mob:
     def up_stairs(self):
         tile = self.world.get_tile(self.x, self.y)
         if tile == Tile.UP_STAIRS:
-            self.world.tiles, self.world.up_stairs_pos, self.world.start_pos = self.world.generator.generate(20, 20)
-            newx, newy = self.world.start_pos
-            self.world.on_mob_move(self.x, self.y, newx, newy)
-            self.x = newx
-            self.y = newy
+            self.world.new_level()
+            self.world.add_mob_at(self, *self.world.start_pos)
+
+    def on_attack(self, attacker):
+        self.kill()
 
 
 class ArchAi:
@@ -251,7 +257,8 @@ class Game:
         self.state = State.PLAY
         self.world = World()
         # self.player = Mob(self.world, 3, 4, 15, None)
-        self.player = Mob(self.world, 4, *self.world.start_pos, None)
+        self.player = Mob(self.world, 4)
+        self.world.add_mob_at(self.player, *self.world.start_pos)
         # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
 
     def on_event(self, event):
@@ -297,6 +304,14 @@ class Game:
 
                 image = self.world.get_image(x, y)
                 surf.blit(image, rect)
+
+        # draw mobs
+        for mob in self.world.mobs:
+            rect = pg.Rect(scroll_x + mob.x*TILE_SIZE, scroll_y + mob.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            if not rect.colliderect(surf.get_rect()): continue
+
+            image = self.world.tile_sheet.subsurface((mob.glyph*TILE_SIZE, 0, TILE_SIZE, TILE_SIZE))
+            surf.blit(image, rect)
 
         if self.state == State.TALK:
             talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
