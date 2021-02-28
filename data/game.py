@@ -4,11 +4,11 @@ import random as rng
 
 import pygame as pg
 
-from assets import Assets, TILE_SIZE
-from items import Item
-from mobs import Bat, Lizardman, Player, Slime
-from quest import Quest
-from world import Tile, World
+from data.assets import Assets, TILE_SIZE
+from data.items import Item
+from data.mobs import Bat, Lizardman, Player, Slime
+from data.quest import Quest
+from data.world import Tile, World
 
 
 class State(Enum):

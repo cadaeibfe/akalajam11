@@ -2,10 +2,10 @@ import random as rng
 
 import pygame as pg
 
-from assets import Assets
-from items import Item
-from quest import Quest
-from world import Tile
+from data.assets import Assets
+from data.items import Item
+from data.quest import Quest
+from data.world import Tile
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, world, factory, tile, max_hp, attack_power, defense_power):

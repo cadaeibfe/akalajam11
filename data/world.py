@@ -3,7 +3,7 @@ import random as rng
 
 import pygame as pg
 
-from assets import Assets, TILE_SIZE
+from data.assets import Assets, TILE_SIZE
 
 
 class Tile(Enum):
