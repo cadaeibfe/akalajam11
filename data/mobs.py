@@ -31,7 +31,7 @@ class Mob(pg.sprite.Sprite):
 
         other = self.world.get_mob(newx, newy)
         if other != None:
-            if other.tile != self.tile:  # mobs only attack different kinds
+            if type(other) != type(self):  # mobs only attack different kinds
                 self.attack(other)
             return
 
