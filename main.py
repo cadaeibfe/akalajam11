@@ -65,9 +65,11 @@ class Game:
         for i in range(num_enemies):
             # choose an enemy type
             if self.player.level == 1:
-                t = rng.randrange(0, 2)  # lizardmen don't spawn at player level 1
+                t = rng.randrange(0, 2)  # only slimes and bats at level 1
+            elif self.player.level < 6 and not Quest.has_shield:
+                t = rng.randrange(0, 3)  # lizardmen can spawn at low levels
             else:
-                t = rng.randrange(0, 3)
+                t = rng.randrange(0, 4)  # lizard knights can spawn
 
             # spawn enemy of the chosen type
             if t == 0:
@@ -79,6 +81,10 @@ class Game:
             elif t == 2:
                 lizardman = Lizardman(self.world, self, Tile.LIZARD, 20, 6, 2, self.player)
                 self.world.add_mob_at_random_empty_pos(lizardman)
+            elif t == 3:
+                lizardknight = Lizardman(self.world, self, Tile.LIZARDKNIGHT, 30, 10, 4, self.player)
+                lizardknight.vision += 1
+                self.world.add_mob_at_random_empty_pos(lizardknight)
 
     def new_float_text(self, text, x, y, color):
         self.float_group.add(FloatText(text, x, y, color))
