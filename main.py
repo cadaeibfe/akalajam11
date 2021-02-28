@@ -60,17 +60,25 @@ class Game:
         self.world.add_mob_at(self.player, *self.world.start_pos)
 
     def create_enemies(self):
-        for i in range(6):
-            t = rng.randrange(0, 3)
+        num_enemies = 5 + self.player.level  # more enemies as player levels up
+
+        for i in range(num_enemies):
+            # choose an enemy type
+            if self.player.level == 1:
+                t = rng.randrange(0, 2)  # lizardmen don't spawn at player level 1
+            else:
+                t = rng.randrange(0, 3)
+
+            # spawn enemy of the chosen type
             if t == 0:
-                lizardman = Lizardman(self.world, self, Tile.LIZARD, 15, 4, 1, self.player)
-                self.world.add_mob_at_random_empty_pos(lizardman)
-            elif t == 1:
-                slime = Slime(self.world, self, Tile.SLIME, 5, 1, 0, self.player)
+                slime = Slime(self.world, self, Tile.SLIME, 6, 2, 0, self.player)
                 self.world.add_mob_at_random_empty_pos(slime)
-            elif t == 2:
-                bat = Bat(self.world, self, Tile.BAT, 10, 2, 0, self.player)
+            elif t == 1:
+                bat = Bat(self.world, self, Tile.BAT, 10, 4, 0, self.player)
                 self.world.add_mob_at_random_empty_pos(bat)
+            elif t == 2:
+                lizardman = Lizardman(self.world, self, Tile.LIZARD, 20, 6, 2, self.player)
+                self.world.add_mob_at_random_empty_pos(lizardman)
 
     def new_float_text(self, text, x, y, color):
         self.float_group.add(FloatText(text, x, y, color))
@@ -146,7 +154,7 @@ class Game:
             self.draw_damage_text(surf)
 
             if self.state == State.TALK:
-                self.draw_text_box(surf)
+                self.draw_talk_box(surf)
             elif self.state == State.GAME_OVER:
                 self.draw_game_over_screen(surf)
             elif self.state == State.WIN:
@@ -162,13 +170,10 @@ class Game:
             pg.draw.rect(surf, color, (50 + i*7, 10, 5, 20))
 
         # draw quest items collected
-        draw_text(surf, Assets.small_font, "Items:", 300, 11)
-        if Quest.has_sword:
-            surf.blit(Assets.tile_sheet_small.subsurface((Tile.SWORD.value*20, 0, 20, 20)), (370, 10))
-        if Quest.has_shield:
-            surf.blit(Assets.tile_sheet_small.subsurface((Tile.SHIELD.value*20, 0, 20, 20)), (400, 10))
-        if Quest.has_crown:
-            surf.blit(Assets.tile_sheet_small.subsurface((Tile.CROWN.value*20, 0, 20, 20)), (430, 10))
+        draw_text(surf, Assets.small_font, f"Treasures: {Quest.num_found()}/3", 420, 11)
+
+        # draw xp and level
+        draw_text(surf, Assets.small_font, f"Level: {self.player.level}  XP: {self.player.xp}/{self.player.xp_needed}", surf.get_width() - 10, 10, "topright")
 
         pg.draw.line(surf, (245, 245, 245), (0, ui_size), (surf.get_width(), ui_size))
 

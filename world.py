@@ -173,7 +173,7 @@ class World:
 
         # calculate scroll so player will be in center
         scroll_x = (surf.get_width() - TILE_SIZE) // 2 - player.x * TILE_SIZE
-        scroll_y = (surf.get_height() - TILE_SIZE) // 2 - player.y * TILE_SIZE
+        scroll_y = (surf.get_height() - TILE_SIZE) // 2 - player.y * TILE_SIZE + 20  # +20 because of the ui
 
         # draw tiles
         for y in range(self.height):

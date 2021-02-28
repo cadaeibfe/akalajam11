@@ -102,6 +102,9 @@ class Player(Mob):
         super().__init__(world, factory, Tile.HERO, 30, 5, 0)
         self.vision = 5.2
         self.spent_turn = False
+        self.level = 1
+        self.xp = 0
+        self.xp_needed = 12
 
     def move(self, mx, my):
         super().move(mx, my)
@@ -117,34 +120,55 @@ class Player(Mob):
                 Quest.has_sword = True
                 self.tile = Tile.HERO_S
                 Assets.powerup_sound.play()
+                new_attack_power = self.attack_power + 2
+                self.factory.talking_time(f"You've found the Necrosaurian Sword,\none of three legendary treasures!\nAttack power: {self.attack_power} -> {new_attack_power}", None)
+                self.attack_power = new_attack_power
+
             elif item.tile == Tile.SHIELD:
                 Quest.has_shield = True
                 self.tile = Tile.HERO_SS
                 Assets.powerup_sound.play()
+                new_defense_power = self.defense_power + 2
+                self.factory.talking_time(f"You've found the Necrosaurian Shield,\none of three legendary treasures!\nDefense power: {self.defense_power} -> {new_defense_power}", None)
+                self.defense_power = new_defense_power
+
             elif item.tile == Tile.CROWN:
                 Quest.has_crown = True
                 Assets.powerup_sound.play()
+                self.factory.talking_time(f"You've found the Necrosaurian Crown,\none of three legendary treasures!\nWith the crown's magic, you can escape\nthis tomb from the stairs.", None)
             
             # check if picked item is a potion
             elif item.tile == Tile.POTION:
-                heal = 10
-                self.hp += heal
-                if self.hp > self.max_hp:
-                    self.hp = self.max_hp
-                self.factory.new_float_text(f"+{heal}", self.x, self.y, (0, 228, 48))
-                Assets.heal_sound.play()
+                self.heal(int(self.max_hp / 5))
 
-    def get_attack_power(self):
-        attack_power = super().get_attack_power()
-        if Quest.has_sword:
-            attack_power += 5
-        return attack_power
+    def attack(self, defender):
+        super().attack(defender)
+        # override player's attack method to get xp from killed mobs
+        if not defender.alive():
+            self.xp += defender.xp
+            while self.xp >= self.xp_needed:
+                self.xp -= self.xp_needed
+                self.level += 1
+                self.xp_needed *= 2
 
-    def get_defense_power(self):
-        defense_power = super().get_defense_power()
-        if Quest.has_shield:
-            defense_power += 5
-        return defense_power
+                # Boost stats
+                new_max_hp = self.max_hp + 3
+                new_attack_power = self.attack_power + 1
+                new_defense_power = self.defense_power + 1
+                self.factory.talking_time(f"You reached level {self.level}!\nMax HP: {self.max_hp} -> {new_max_hp}\nAttack power: {self.attack_power} -> {new_attack_power}\nDefense power: {self.defense_power} -> {new_defense_power}", None)
+                self.max_hp = new_max_hp
+                self.attack_power = new_attack_power
+                self.defense_power = new_defense_power
+
+                # heal some
+                self.heal(int(self.max_hp / 10))
+
+    def heal(self, amount):
+        self.hp += amount
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+        self.factory.new_float_text(f"+{amount}", self.x, self.y, (0, 228, 48))
+        Assets.heal_sound.play()
 
 
 class Lizardman(Mob):
@@ -152,6 +176,7 @@ class Lizardman(Mob):
         super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
         self.target = target
         self.vision = 4
+        self.xp = 12
 
     def update(self):
         if self.can_see(self.target.x, self.target.y):
@@ -179,6 +204,7 @@ class Slime(Mob):
         super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
         self.target = target
         self.vision = 2
+        self.xp = 4
 
     def update(self):
         num_turns = rng.randrange(0, 2)  # slime is slow, sometimes doesn't move
@@ -189,7 +215,7 @@ class Slime(Mob):
                 self.wander()
 
     def drop_loot(self):
-        if rng.random() < 0.4:
+        if rng.random() < 0.35:
             self.world.items.add(Item(Tile.POTION, self.x, self.y))
 
 
@@ -198,18 +224,19 @@ class Bat(Mob):
         super().__init__(world, factory, tile, max_hp, attack_power, defense_power)
         self.target = target
         self.vision = 2
+        self.xp = 6
 
     def update(self):
-        num_turns = rng.randrange(1, 3)  # bat is fast, sometimes gets 2 moves
-        for i in range(num_turns):
-            if self.can_see(self.target.x, self.target.y):
-                self.hunt()
-            else:
+        if self.can_see(self.target.x, self.target.y):
+            self.hunt()
+        else:
+            num_turns = rng.randrange(1, 3)
+            for i in range(num_turns):
                 self.wander()
 
     def drop_loot(self):
         # Bats are harder so have higher chance to drop a potion
-        if rng.random() < 0.8:
+        if rng.random() < 0.7:
             self.world.items.add(Item(Tile.POTION, self.x, self.y))
 
 
