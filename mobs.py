@@ -199,7 +199,7 @@ class Lizardman(Mob):
                 Quest.treasure_dropped_this_level = True
             else:  # no more treasures, just drop a potion
                 self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
-        elif r < 0.6:
+        elif r < 0.4:
             self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
@@ -219,7 +219,7 @@ class Slime(Mob):
                 self.wander()
 
     def drop_loot(self):
-        if rng.random() < 0.35:
+        if rng.random() < 0.25:
             self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
@@ -240,7 +240,7 @@ class Bat(Mob):
 
     def drop_loot(self):
         # Bats are harder so have higher chance to drop a potion
-        if rng.random() < 0.7:
+        if rng.random() < 0.5:
             self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 

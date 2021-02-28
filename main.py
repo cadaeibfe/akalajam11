@@ -112,10 +112,6 @@ class Game:
                     self.player.move(0, 1)
                 elif event.key == pg.K_SPACE or event.key == pg.K_RETURN:
                     self.player.spent_turn = True
-                ## DEBUG
-                elif event.key == pg.K_r:
-                    self.new_game()
-                ## ENDDEBUG
 
                 if self.world.get_tile(self.player.x, self.player.y) == Tile.UP_STAIRS:
                     self.up_stairs()
