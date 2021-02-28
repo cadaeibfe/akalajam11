@@ -22,6 +22,7 @@ class State(Enum):
 class Game:
     def run(self):
         # Basic setup
+        pg.display.set_caption("Tomb of the Lizard King")
         screen = pg.display.set_mode((800, 600))
         clock = pg.time.Clock()
         dt = 0
@@ -30,8 +31,8 @@ class Game:
         Assets.load_assets()
 
         # Show title screen when program starts
-        # self.state = State.TITLE
-        self.new_game() ##DEBUG
+        self.state = State.TITLE
+        # self.new_game() ##DEBUG
 
         # Main game loop
         while True:
@@ -68,7 +69,7 @@ class Game:
             elif self.player.level < 6 and not Quest.has_shield:
                 t = rng.randrange(0, 3)  # lizardmen can spawn at low levels
             else:
-                t = rng.randrange(0, 4)  # lizard knights can spawn
+                t = rng.randrange(0, 5)  # lizard knights and skeletons can spawn
 
             # spawn enemy of the chosen type
             if t == 0:
@@ -81,6 +82,11 @@ class Game:
                 lizardman = Lizardman(self.world, self, Tile.LIZARD, 20, 6, 2, self.player)
                 self.world.add_mob_at_random_empty_pos(lizardman)
             elif t == 3:
+                lizardskelly = Lizardman(self.world, self, Tile.LIZARDBONES, 25, 7, 3, self.player)
+                lizardskelly.treasure_drop_rate *= 2
+                lizardskelly.xp *= 2
+                self.world.add_mob_at_random_empty_pos(lizardskelly)
+            elif t == 4:
                 lizardknight = Lizardman(self.world, self, Tile.LIZARDKNIGHT, 30, 10, 4, self.player)
                 lizardknight.vision += 1
                 lizardknight.treasure_drop_rate *= 3
@@ -152,11 +158,11 @@ class Game:
 
     def on_draw(self, surf):
         ui_size = 40
-        surf.fill((0, 0, 0))
 
         if self.state == State.TITLE:
             self.draw_title_screen(surf)
         else:
+            surf.fill((0, 0, 0))
             self.world.draw(surf, self.player, ui_size)
             self.draw_ui(surf, ui_size)
             self.draw_damage_text(surf)
@@ -206,9 +212,14 @@ class Game:
         pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
 
     def draw_title_screen(self, surf):
-        draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 150, "center")
-        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 40, "center")
-        draw_text(surf, Assets.talk_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 150, "center")
+        surf.fill((26, 28, 44))
+
+        rect = Assets.title_image.get_rect(center = (surf.get_width()//2, surf.get_height()//2 + 100))
+        surf.blit(Assets.title_image, rect)
+
+        draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 180, "center")
+        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 70, "center")
+        draw_text(surf, Assets.talk_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 260, "center")
 
     def draw_game_over_screen(self, surf):
         draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")

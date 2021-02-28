@@ -17,6 +17,7 @@ class Tile(Enum):
     SKULL = 7
     LIZARD = 9
     LIZARDKNIGHT = 10
+    LIZARDBONES = 11
     SLIME = 12
     BAT = 13
     SWORD = 14
