@@ -19,15 +19,22 @@ class Assets:
         Assets.title_image = pg.transform.scale(Assets.title_image, (Assets.title_image.get_width()*5, Assets.title_image.get_height()*5))
 
         # sounds
-        Assets.step_sound = pg.mixer.Sound("data/sounds/Hit_Hurt5.wav")
-        Assets.bump_sound = pg.mixer.Sound("data/sounds/Hit_Hurt4.wav")
-        Assets.hit_sound = pg.mixer.Sound("data/sounds/Hit_Hurt22.wav")
-        Assets.up_stairs_sound = pg.mixer.Sound("data/sounds/Hit_Hurt3.wav")
-        Assets.powerup_sound = pg.mixer.Sound("data/sounds/Powerup6.wav")
-        Assets.heal_sound = pg.mixer.Sound("data/sounds/Powerup12.wav")
-        Assets.select_sound = pg.mixer.Sound("data/sounds/Blip_Select6.wav")
-        Assets.game_over_sound = pg.mixer.Sound("data/sounds/Randomize39.wav")
-        Assets.win_sound = pg.mixer.Sound("data/sounds/Powerup19.wav")
+        Assets.step_sound = Assets.load_sound("data/sounds/Hit_Hurt5.wav")
+        Assets.bump_sound = Assets.load_sound("data/sounds/Hit_Hurt4.wav")
+        Assets.hit_sound = Assets.load_sound("data/sounds/Hit_Hurt22.wav")
+        Assets.up_stairs_sound = Assets.load_sound("data/sounds/Hit_Hurt3.wav")
+        Assets.powerup_sound = Assets.load_sound("data/sounds/Powerup6.wav")
+        Assets.heal_sound = Assets.load_sound("data/sounds/Powerup12.wav")
+        Assets.select_sound = Assets.load_sound("data/sounds/Blip_Select6.wav")
+        Assets.game_over_sound = Assets.load_sound("data/sounds/Randomize39.wav")
+        Assets.win_sound = Assets.load_sound("data/sounds/Powerup19.wav")
+
+    @staticmethod
+    def load_sound(filepath, volume=0.4):
+        # helper method to set the volume of all sounds as they are loaded
+        sound = pg.mixer.Sound(filepath)
+        sound.set_volume(volume)
+        return sound
 
     @staticmethod
     def get_tile_image(tile, flip_h=False):
