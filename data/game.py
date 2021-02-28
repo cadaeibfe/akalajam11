@@ -246,7 +246,7 @@ class Game:
         draw_text(surf, Assets.small_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 60, "center")
 
     def draw_win_screen(self, surf):
-        draw_text(surf, Assets.big_font, "You Win!", surf.get_width()//2, surf.get_height()//2 - 70, "center")
+        draw_text(surf, Assets.big_font, "You Escaped!", surf.get_width()//2, surf.get_height()//2 - 70, "center")
         draw_text(surf, Assets.damage_font, "Thanks for playing!", surf.get_width()//2, surf.get_height()//2 + 60, "center")
         draw_text(surf, Assets.small_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 100, "center")
 
