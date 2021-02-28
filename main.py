@@ -21,6 +21,8 @@ class State(Enum):
 
 class Game:
     def run(self):
+        self.first_time = True
+
         # Basic setup
         pg.display.set_caption("Tomb of the Lizard King")
         screen = pg.display.set_mode((800, 600))
@@ -56,6 +58,11 @@ class Game:
         self.new_player()
         self.create_enemies_and_items()
 
+        # intro
+        if self.first_time:
+            self.talking_time("You are trapped in the tomb of Necro-saurian kings.\nCollect the 3 treasures and climb up to escape.\nArrows keys to move, Space/Return to pass time or dismiss text boxes.", None)
+            self.first_time = False
+
     def new_player(self):
         self.player = Player(self.world, self)
         self.world.add_mob_at(self.player, *self.world.start_pos)
@@ -84,7 +91,7 @@ class Game:
                 lizardman = Lizardman(self.world, self, Tile.LIZARD, 20, 6, 2, self.player)
                 self.world.add_mob_at_random_empty_pos(lizardman)
             elif t == 3:
-                lizardskelly = Lizardman(self.world, self, Tile.LIZARDBONES, 25, 7, 3, self.player)
+                lizardskelly = Lizardman(self.world, self, Tile.LIZARDBONES, 25, 8, 3, self.player)
                 lizardskelly.treasure_drop_rate *= 2
                 lizardskelly.xp *= 2
                 self.world.add_mob_at_random_empty_pos(lizardskelly)
@@ -208,8 +215,8 @@ class Game:
 
         y = 40
         for line in self.talk_lines:
-            draw_text(surf, Assets.talk_font, line, 40, y)
-            y += Assets.talk_font.get_linesize() + 1
+            draw_text(surf, Assets.small_font, line, 40, y)
+            y += Assets.small_font.get_linesize() + 5
 
         pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
 
@@ -221,16 +228,16 @@ class Game:
 
         draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 180, "center")
         draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-        draw_text(surf, Assets.talk_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 260, "center")
+        draw_text(surf, Assets.small_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 260, "center")
 
     def draw_game_over_screen(self, surf):
         draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-        draw_text(surf, Assets.talk_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+        draw_text(surf, Assets.small_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 60, "center")
 
     def draw_win_screen(self, surf):
         draw_text(surf, Assets.big_font, "You Win!", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-        draw_text(surf, Assets.talk_font, "Thanks for playing!", surf.get_width()//2, surf.get_height()//2 + 60, "center")
-        draw_text(surf, Assets.talk_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 100, "center")
+        draw_text(surf, Assets.damage_font, "Thanks for playing!", surf.get_width()//2, surf.get_height()//2 + 60, "center")
+        draw_text(surf, Assets.small_font, "Press [Space] To Return To Title", surf.get_width()//2, surf.get_height()//2 + 100, "center")
 
     def talking_time(self, text, action):
         self.state = State.TALK

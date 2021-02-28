@@ -8,7 +8,6 @@ class Assets:
         # fonts
         Assets.big_font = pg.font.Font("freesansbold.ttf", 100)
         Assets.damage_font = pg.font.Font("freesansbold.ttf", 44)
-        Assets.talk_font = pg.font.Font("freesansbold.ttf", 28)
         Assets.small_font = pg.font.Font("freesansbold.ttf", 20)
 
         # images

@@ -121,7 +121,7 @@ class Player(Mob):
                 self.tile = Tile.HERO_S
                 Assets.powerup_sound.play()
                 new_attack_power = self.attack_power + 2
-                self.factory.talking_time(f"You've found the Necrosaurian Sword,\none of three legendary treasures!\nAttack power: {self.attack_power} -> {new_attack_power}", None)
+                self.factory.talking_time(f"You've found the Necro-saurian Sword,\none of three legendary treasures!\nAttack power: {self.attack_power} -> {new_attack_power}", None)
                 self.attack_power = new_attack_power
 
             elif item.tile == Tile.SHIELD:
@@ -129,13 +129,13 @@ class Player(Mob):
                 self.tile = Tile.HERO_SS
                 Assets.powerup_sound.play()
                 new_defense_power = self.defense_power + 2
-                self.factory.talking_time(f"You've found the Necrosaurian Shield,\none of three legendary treasures!\nDefense power: {self.defense_power} -> {new_defense_power}", None)
+                self.factory.talking_time(f"You've found the Necro-saurian Shield,\none of three legendary treasures!\nDefense power: {self.defense_power} -> {new_defense_power}", None)
                 self.defense_power = new_defense_power
 
             elif item.tile == Tile.CROWN:
                 Quest.has_crown = True
                 Assets.powerup_sound.play()
-                self.factory.talking_time(f"You've found the Necrosaurian Crown,\none of three legendary treasures!\nWith the crown's magic, you can escape\nthis tomb from the stairs.", None)
+                self.factory.talking_time(f"You've found the Necro-saurian Crown,\none of three legendary treasures!\nWith the crown's magic, you can escape\nthis tomb from the stairs.", None)
             
             # check if picked item is a potion
             elif item.tile == Tile.POTION:
@@ -219,7 +219,7 @@ class Slime(Mob):
                 self.wander()
 
     def drop_loot(self):
-        if rng.random() < 0.25:
+        if rng.random() < 0.20:
             self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
@@ -240,7 +240,7 @@ class Bat(Mob):
 
     def drop_loot(self):
         # Bats are harder so have higher chance to drop a potion
-        if rng.random() < 0.5:
+        if rng.random() < 0.4:
             self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
