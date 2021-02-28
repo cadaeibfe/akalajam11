@@ -114,11 +114,10 @@ class Game:
                     self.up_stairs()
 
         elif self.state == State.TALK:
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_z:
-                    self.state = State.PLAY
-                    if self.talk_action != None:
-                        self.talk_action()
+            if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_RETURN):
+                self.state = State.PLAY
+                if self.talk_action != None:
+                    self.talk_action()
 
         elif self.state == State.GAME_OVER:
             if event.type == pg.KEYDOWN and (event.key == pg.K_SPACE or event.key == pg.K_RETURN):
