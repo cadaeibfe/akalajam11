@@ -4,6 +4,7 @@ class Quest:
         Quest.has_sword = False
         Quest.has_shield = False
         Quest.has_crown = False
+        Quest.treasure_dropped_this_level = False  # only allow one treasure to drop per level
 
     @staticmethod
     def num_found():

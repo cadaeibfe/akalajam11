@@ -186,13 +186,16 @@ class Lizardman(Mob):
         r = rng.random()
 
         # lizardmen can drop the three treasures, in order
-        if r < 0.2:
+        if r < 0.2 and not Quest.treasure_dropped_this_level:
             if not Quest.has_sword:
                 self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+                Quest.treasure_dropped_this_level = True
             elif not Quest.has_shield:
                 self.world.items.add(Item(Tile.SHIELD, self.x, self.y))
+                Quest.treasure_dropped_this_level = True
             elif not Quest.has_crown:
                 self.world.items.add(Item(Tile.CROWN, self.x, self.y))
+                Quest.treasure_dropped_this_level = True
             else:  # no more treasures, just drop a potion
                 self.world.items.add(Item(Tile.POTION, self.x, self.y))
         elif r < 0.6:

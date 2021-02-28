@@ -237,6 +237,7 @@ class Game:
                 self.world.new_level()
                 self.world.add_mob_at(self.player, *self.world.start_pos)
                 self.create_enemies()
+                Quest.treasure_dropped_this_level = False  # reset flag so treasure can drop again
 
 
 class FloatText(pg.sprite.Sprite):
