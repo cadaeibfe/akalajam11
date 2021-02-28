@@ -1,5 +1,6 @@
 from enum import Enum
 from functools import lru_cache
+import os.path
 import random as rng
 
 import pygame as pg
@@ -22,6 +23,7 @@ class State(Enum):
 class Game:
     def run(self):
         self.first_time = True
+        screenshot_num = 0
 
         # Basic setup
         pg.display.set_caption("Tomb of the Lizard King")
@@ -41,6 +43,15 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     return
+                elif event.type == pg.KEYDOWN and event.key == pg.K_o:
+                    while True:
+                        filename = f"screenshot{screenshot_num:02d}.png"
+                        if not os.path.exists(filename):
+                            print(f"saving screenshot: {filename}")
+                            pg.image.save(screen, filename)
+                            break
+                        else:
+                            screenshot_num += 1
                 else:
                     self.on_event(event)
 
