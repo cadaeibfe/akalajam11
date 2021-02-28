@@ -177,6 +177,7 @@ class Lizardman(Mob):
         self.target = target
         self.vision = 4
         self.xp = 12
+        self.treasure_drop_rate = 0.2
 
     def update(self):
         if self.can_see(self.target.x, self.target.y):
@@ -186,7 +187,7 @@ class Lizardman(Mob):
         r = rng.random()
 
         # lizardmen can drop the three treasures, in order
-        if r < 0.2 and not Quest.treasure_dropped_this_level:
+        if r < self.treasure_drop_rate and not Quest.treasure_dropped_this_level:
             if not Quest.has_sword:
                 self.world.items.add(Item(Tile.SWORD, self.x, self.y))
                 Quest.treasure_dropped_this_level = True

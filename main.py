@@ -84,6 +84,8 @@ class Game:
             elif t == 3:
                 lizardknight = Lizardman(self.world, self, Tile.LIZARDKNIGHT, 30, 10, 4, self.player)
                 lizardknight.vision += 1
+                lizardknight.treasure_drop_rate *= 3
+                lizardknight.xp *= 4
                 self.world.add_mob_at_random_empty_pos(lizardknight)
 
     def new_float_text(self, text, x, y, color):
