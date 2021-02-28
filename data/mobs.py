@@ -184,19 +184,20 @@ class Lizardman(Mob):
             self.hunt()
 
     def drop_loot(self):
+        Quest.kills_until_treasure -= 1
         r = rng.random()
 
         # lizardmen can drop the three treasures, in order
-        if r < self.treasure_drop_rate and not Quest.treasure_dropped_this_level:
+        if r < self.treasure_drop_rate and Quest.can_drop_treasure():
             if not Quest.has_sword:
                 self.world.add_item_at(Item(Tile.SWORD), self.x, self.y)
-                Quest.treasure_dropped_this_level = True
+                Quest.reset_kills()
             elif not Quest.has_shield:
                 self.world.add_item_at(Item(Tile.SHIELD), self.x, self.y)
-                Quest.treasure_dropped_this_level = True
+                Quest.reset_kills()
             elif not Quest.has_crown:
                 self.world.add_item_at(Item(Tile.CROWN), self.x, self.y)
-                Quest.treasure_dropped_this_level = True
+                Quest.reset_kills()
             else:  # no more treasures, just drop a potion
                 self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
         elif r < 0.4:
