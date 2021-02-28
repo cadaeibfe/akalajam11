@@ -66,10 +66,12 @@ class Game:
             # choose an enemy type
             if self.player.level == 1:
                 t = rng.randrange(0, 2)  # only slimes and bats at level 1
-            elif self.player.level < 6 and not Quest.has_shield:
+            elif self.player.level < 5 and not Quest.has_shield:
                 t = rng.randrange(0, 3)  # lizardmen can spawn at low levels
+            elif self.player.level < 6:
+                t = rng.randrange(0, 4)  # skeletons start to show up
             else:
-                t = rng.randrange(0, 5)  # lizard knights and skeletons can spawn
+                t = rng.randrange(0, 5)  # lizard knights can spawn
 
             # spawn enemy of the chosen type
             if t == 0:
