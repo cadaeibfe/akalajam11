@@ -189,18 +189,18 @@ class Lizardman(Mob):
         # lizardmen can drop the three treasures, in order
         if r < self.treasure_drop_rate and not Quest.treasure_dropped_this_level:
             if not Quest.has_sword:
-                self.world.items.add(Item(Tile.SWORD, self.x, self.y))
+                self.world.add_item_at(Item(Tile.SWORD), self.x, self.y)
                 Quest.treasure_dropped_this_level = True
             elif not Quest.has_shield:
-                self.world.items.add(Item(Tile.SHIELD, self.x, self.y))
+                self.world.add_item_at(Item(Tile.SHIELD), self.x, self.y)
                 Quest.treasure_dropped_this_level = True
             elif not Quest.has_crown:
-                self.world.items.add(Item(Tile.CROWN, self.x, self.y))
+                self.world.add_item_at(Item(Tile.CROWN), self.x, self.y)
                 Quest.treasure_dropped_this_level = True
             else:  # no more treasures, just drop a potion
-                self.world.items.add(Item(Tile.POTION, self.x, self.y))
+                self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
         elif r < 0.6:
-            self.world.items.add(Item(Tile.POTION, self.x, self.y))
+            self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
 class Slime(Mob):
@@ -220,7 +220,7 @@ class Slime(Mob):
 
     def drop_loot(self):
         if rng.random() < 0.35:
-            self.world.items.add(Item(Tile.POTION, self.x, self.y))
+            self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
 class Bat(Mob):
@@ -241,7 +241,7 @@ class Bat(Mob):
     def drop_loot(self):
         # Bats are harder so have higher chance to drop a potion
         if rng.random() < 0.7:
-            self.world.items.add(Item(Tile.POTION, self.x, self.y))
+            self.world.add_item_at(Item(Tile.POTION), self.x, self.y)
 
 
 # class ArchAi:

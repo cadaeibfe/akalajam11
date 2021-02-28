@@ -5,6 +5,7 @@ import random as rng
 import pygame as pg
 
 from assets import Assets, TILE_SIZE
+from items import Item
 from mobs import Bat, Lizardman, Player, Slime
 from quest import Quest
 from world import Tile, World
@@ -52,16 +53,14 @@ class Game:
         self.state = State.PLAY
         self.world = World()
         self.new_player()
-        self.create_enemies()
-        # self.arch = Mob(self.world, 4, 4, 11, ArchAi(self))
+        self.create_enemies_and_items()
 
     def new_player(self):
         self.player = Player(self.world, self)
         self.world.add_mob_at(self.player, *self.world.start_pos)
 
-    def create_enemies(self):
+    def create_enemies_and_items(self):
         num_enemies = 5 + self.player.level  # more enemies as player levels up
-
         for i in range(num_enemies):
             # choose an enemy type
             if self.player.level == 1:
@@ -87,6 +86,10 @@ class Game:
                 lizardknight.treasure_drop_rate *= 3
                 lizardknight.xp *= 4
                 self.world.add_mob_at_random_empty_pos(lizardknight)
+
+        num_items = num_enemies // 3
+        for i in range(num_items):
+            self.world.add_item_at_random_empty_pos(Item(Tile.POTION))
 
     def new_float_text(self, text, x, y, color):
         self.float_group.add(FloatText(text, x, y, color))
@@ -202,7 +205,7 @@ class Game:
         y = 40
         for line in self.talk_lines:
             draw_text(surf, Assets.talk_font, line, 40, y)
-            y += Assets.talk_font.get_linesize()
+            y += Assets.talk_font.get_linesize() + 1
 
         pg.draw.rect(surf, (245, 245, 245), (talk_rect.right-30, talk_rect.bottom-30, 20, 20))
 
@@ -239,7 +242,7 @@ class Game:
                 # if not, just generate another level
                 self.world.new_level()
                 self.world.add_mob_at(self.player, *self.world.start_pos)
-                self.create_enemies()
+                self.create_enemies_and_items()
                 Quest.treasure_dropped_this_level = False  # reset flag so treasure can drop again
                 self.player.spent_turn = False  # don't spend a turn climbinb stairs, otherwise enemies get a free attack
 

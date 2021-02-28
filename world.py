@@ -15,15 +15,14 @@ class Tile(Enum):
     HERO_S = 5
     HERO_SS = 6
     SKULL = 7
-    ARCH = 8
     LIZARD = 9
     LIZARDKNIGHT = 10
-    SLIME = 11
-    BAT = 12
-    SWORD = 13
-    SHIELD = 14
-    CROWN = 15
-    POTION = 16
+    SLIME = 12
+    BAT = 13
+    SWORD = 14
+    SHIELD = 15
+    CROWN = 16
+    POTION = 17
 
 
 class MazeGenerator:
@@ -153,6 +152,37 @@ class World:
     def is_walkable(self, x, y):
         tile = self.get_tile(x, y)
         return tile == Tile.FLOOR or tile == Tile.UP_STAIRS
+
+    def add_item_at_random_empty_pos(self, item):
+        for i in range(100):
+            x = rng.randrange(0, self.width)
+            y = rng.randrange(0, self.height)
+            if (x, y) != self.start_pos and self.is_walkable(x, y):
+                self.add_item_at(item, x, y)
+                break
+
+    def add_item_at(self, item, x, y):
+        candidates = [(x, y)]
+        checked = []
+
+        # search for the empty position nearest (x, y)
+        while len(candidates) > 0:
+            p = candidates.pop(0)
+            checked.append(p)
+
+            if not self.is_walkable(*p):
+                continue
+
+            if self.get_item(*p) == None:
+                self.items.add(item)
+                item.x, item.y = p
+                return
+            else:
+                for d in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    n = ((p[0] + d[0]), (p[1] + d[1]))
+                    if n[0] >= 0 and n[0] < self.width and n[1] >= 0 and n[1] < self.height and n not in checked:
+                        candidates.append(n)
+
 
     def add_mob_at_random_empty_pos(self, mob):
         for i in range(100):
