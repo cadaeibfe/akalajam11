@@ -16,7 +16,7 @@ class Assets:
         Assets.tile_sheet_flipped = pg.transform.flip(Assets.tile_sheet, True, False)
 
         Assets.title_image = pg.image.load("images/title.png").convert()
-        Assets.title_image = pg.transform.scale(Assets.title_image, (Assets.title_image.get_width()*4, Assets.title_image.get_height()*4))
+        Assets.title_image = pg.transform.scale(Assets.title_image, (Assets.title_image.get_width()*5, Assets.title_image.get_height()*5))
 
         # sounds
         Assets.step_sound = pg.mixer.Sound("sounds/Hit_Hurt5.wav")

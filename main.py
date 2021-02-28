@@ -25,7 +25,7 @@ class Game:
 
         # Basic setup
         pg.display.set_caption("Tomb of the Lizard King")
-        screen = pg.display.set_mode((800, 600))
+        screen = pg.display.set_mode((1024, 768))
         clock = pg.time.Clock()
         dt = 0
 
@@ -193,7 +193,7 @@ class Game:
             pg.draw.rect(surf, color, (50 + i*7, 10, 5, 20))
 
         # draw quest items collected
-        draw_text(surf, Assets.small_font, f"Treasures: {Quest.num_found()}/3", 420, 11)
+        draw_text(surf, Assets.small_font, f"Treasures: {Quest.num_found()}/3", 540, 11)
 
         # draw xp and level
         draw_text(surf, Assets.small_font, f"Level: {self.player.level}  XP: {self.player.xp}/{self.player.xp_needed}", surf.get_width() - 10, 10, "topright")
@@ -209,11 +209,11 @@ class Game:
             surf.blit(float_text.image, rect)
 
     def draw_talk_box(self, surf):
-        talk_rect = pg.Rect(20, 20, surf.get_width() - 40, 200)
+        talk_rect = pg.Rect(20, 60, surf.get_width() - 40, 200)
         pg.draw.rect(surf, (0, 0, 0), talk_rect)
         pg.draw.rect(surf, (245, 245, 245), talk_rect, 1)
 
-        y = 40
+        y = talk_rect.top + 20
         for line in self.talk_lines:
             draw_text(surf, Assets.small_font, line, 40, y)
             y += Assets.small_font.get_linesize() + 5
@@ -226,9 +226,9 @@ class Game:
         rect = Assets.title_image.get_rect(center = (surf.get_width()//2, surf.get_height()//2 + 100))
         surf.blit(Assets.title_image, rect)
 
-        draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 180, "center")
-        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 70, "center")
-        draw_text(surf, Assets.small_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 260, "center")
+        draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 240, "center")
+        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 100, "center")
+        draw_text(surf, Assets.small_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 300, "center")
 
     def draw_game_over_screen(self, surf):
         draw_text(surf, Assets.big_font, "Game Over", surf.get_width()//2, surf.get_height()//2 - 70, "center")
