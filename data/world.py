@@ -99,24 +99,6 @@ class MazeGenerator:
 
 class World:
     def __init__(self):
-        # self.tiles = [[1, 1, 1, 1, 1, 1, 1, 1, 1],
-        #               [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        #               [1, 0, 0, 1, 1, 1, 0, 0, 1],
-        #               [1, 0, 0, 1, 4, 1, 0, 0, 1],
-        #               [1, 0, 0, 1, 0, 1, 0, 0, 1],
-        #               [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        #               [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        #               [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        #               [1, 1, 0, 0, 0, 0, 0, 1, 1],
-        #               [1, 1, 0, 1, 1, 1, 0, 1, 1],
-        #               [1, 1, 0, 0, 0, 0, 0, 1, 1],
-        #               [1, 1, 1, 1, 0, 1, 1, 1, 1],
-        #               [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        #               [1, 1, 0, 0, 0, 0, 0, 1, 1],
-        #               [1, 1, 0, 0, 0, 0, 0, 1, 1],
-        #               [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        #               [1, 1, 1, 1, 0, 1, 1, 1, 1],
-        #               [1, 1, 1, 1, 1, 1, 1, 1, 1]]
         self.generator = MazeGenerator()
         self.new_level()
 
@@ -171,7 +153,9 @@ class World:
             p = candidates.pop(0)
             checked.append(p)
 
-            if not self.is_walkable(*p):
+            if not self.is_walkable(*p):  # don't drop item in a wall
+                continue
+            if self.get_mob(*p) != None:  # don't drop item under a mob
                 continue
 
             if self.get_item(*p) == None:
