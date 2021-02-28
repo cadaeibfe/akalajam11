@@ -227,7 +227,7 @@ class Game:
         surf.blit(Assets.title_image, rect)
 
         draw_text(surf, Assets.big_font, "Tomb of the", surf.get_width()//2, surf.get_height()//2 - 240, "center")
-        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 100, "center")
+        draw_text(surf, Assets.big_font, "Lizard King", surf.get_width()//2, surf.get_height()//2 - 130, "center")
         draw_text(surf, Assets.small_font, "Press [Space] To Play", surf.get_width()//2, surf.get_height()//2 + 300, "center")
 
     def draw_game_over_screen(self, surf):
